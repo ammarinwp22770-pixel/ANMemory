@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory ของเรา 💖</title>
+
+    <!-- เชื่อม CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Canvas สำหรับ Particle background -->
+    <canvas id="particles"></canvas>
+
+    <!-- Container หลัก -->
+    <div class="container">
+        <h1>ครบรอบ 1 ปีของเรา 💕</h1>
+
+        <!-- Grid สำหรับกรอบรูป / memory card -->
+        <div class="memory-grid">
+            <!-- กรอบรูป 1 -->
+            <div class="memory-card" data-index="0">
+                <img src="images/photo1.jpg" alt="รูปของเรา" class="memory-img">
+                <textarea placeholder="เขียนความทรงจำตรงนี้..."></textarea>
+            </div>
+            <!-- กรอบรูป 2 -->
+            <div class="memory-card" data-index="1">
+                <img src="images/photo2.jpg" alt="รูปของเรา" class="memory-img">
+                <textarea placeholder="เขียนความทรงจำตรงนี้..."></textarea>
+            </div>
+            <!-- เพิ่มกรอบรูปใหม่ได้เรื่อย ๆ โดยคัดลอก div.memory-card -->
+        </div>
+    </div>
+
+    <!-- Lightbox สำหรับขยายรูปใหญ่ -->
+    <div id="lightbox" class="lightbox">
+        <span id="close-lightbox">&times;</span>
+        <img class="lightbox-img" src="">
+    </div>
+
+    <!-- เชื่อม JS -->
+    <script src="script.js"></script>
+</body>
+</html>

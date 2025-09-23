@@ -1,0 +1,134 @@
+/* ==========================
+   โทนสีชมพูหวาน ๆ
+========================== */
+:root {
+    --pink: #ffc0cb;
+    --light-pink: #ffe6f0;
+    --dark-pink: #ff69b4;
+}
+
+/* ==========================
+   Reset และ font พื้นฐาน
+========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    background: var(--light-pink);
+    position: relative;
+}
+
+/* ==========================
+   Particle canvas
+========================== */
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* อยู่หลัง content */
+}
+
+/* ==========================
+   Container หลัก
+========================== */
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+h1 {
+    color: var(--dark-pink);
+    margin-bottom: 30px;
+}
+
+/* ==========================
+   Grid สำหรับ memory card
+========================== */
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* ==========================
+   กรอบ memory card
+========================== */
+.memory-card {
+    background: var(--pink);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.memory-card:hover {
+    transform: scale(1.05);
+}
+
+/* รูปในกรอบ */
+.memory-img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    cursor: pointer; /* บอกว่ากดได้ */
+}
+
+/* textarea สำหรับพิมพ์ memory */
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    resize: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    height: 80px;
+    text-align: center;
+    background: #fff0f5;
+}
+
+/* ==========================
+   Lightbox สำหรับขยายรูป
+========================== */
+.lightbox {
+    display: none; /* เริ่มต้นซ่อน */
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+}
+
+.lightbox-img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 20px;
+}
+
+#close-lightbox {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: white;
+    font-size: 50px;
+    cursor: pointer;
+}
