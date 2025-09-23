@@ -105,3 +105,38 @@ window.addEventListener('keydown', e => {
         document.getElementById('lightbox').style.display = 'none';
     }
 });
+
+const music = document.getElementById("bg-music");
+const playBtn = document.getElementById("play-btn");
+const seekBar = document.getElementById("seek-bar");
+const volumeBar = document.getElementById("volume-bar");
+
+let isPlaying = false;
+
+// Play/Pause
+playBtn.addEventListener("click", () => {
+  if (isPlaying) {
+    music.pause();
+    playBtn.textContent = "▶️";
+  } else {
+    music.play();
+    playBtn.textContent = "⏸️";
+  }
+  isPlaying = !isPlaying;
+});
+
+// Update seek bar while playing
+music.addEventListener("timeupdate", () => {
+  const value = (music.currentTime / music.duration) * 100;
+  seekBar.value = value || 0;
+});
+
+// Seek functionality
+seekBar.addEventListener("input", () => {
+  music.currentTime = (seekBar.value / 100) * music.duration;
+});
+
+// Volume control
+volumeBar.addEventListener("input", () => {
+  music.volume = volumeBar.value;
+});

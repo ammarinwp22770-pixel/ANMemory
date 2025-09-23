@@ -1,44 +1,114 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory ของเรา 💖</title>
-
-    <!-- เชื่อม CSS -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory ของเรา 💖</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .music-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 60px;
+      height: 60px;
+    }
+    .music-btn img {
+      width: 100%;
+      height: 100%;
+    }
+    .memory-text {
+      font-size: 1.2rem;
+      color: #ff1493;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .memory-text:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
-    <!-- Canvas สำหรับ Particle background -->
-    <canvas id="particles"></canvas>
+  <canvas id="particles"></canvas>
 
-    <!-- Container หลัก -->
-    <div class="container">
-        <h1>ครบรอบ 1 ปีของเรา 💕</h1>
+  <div class="container">
+    <h1>Happy Anniversary 💕</h1>
 
-        <!-- Grid สำหรับกรอบรูป / memory card -->
-        <div class="memory-grid">
-            <!-- กรอบรูป 1 -->
-            <div class="memory-card" data-index="0">
-                <img src="images/photo1.jpg" alt="รูปของเรา" class="memory-img">
-                <textarea placeholder="เขียนความทรงจำตรงนี้..."></textarea>
-            </div>
-            <!-- กรอบรูป 2 -->
-            <div class="memory-card" data-index="1">
-                <img src="images/photo2.jpg" alt="รูปของเรา" class="memory-img">
-                <textarea placeholder="เขียนความทรงจำตรงนี้..."></textarea>
-            </div>
-            <!-- เพิ่มกรอบรูปใหม่ได้เรื่อย ๆ โดยคัดลอก div.memory-card -->
-        </div>
+    <div class="memory-grid">
+      <!-- กรอบรูป 1 -->
+      <div class="memory-card" data-index="0">
+        <img src="images/2.avif" alt="รูปแรก" class="memory-img" id="play-video-0">
+        <p class="memory-text">จุดเริ่มต้นมาจากแอปเปิ้ลลูกนึง (แต่ลูกไหน?)</p>
+      </div>
+
+      <!-- กรอบรูป 2 = กดแล้วไป timeline.html -->
+      <div class="memory-card" data-index="1">
+        <a href="timeline.html">
+          <img src="images/1.png" alt="รูปของเรา" class="memory-img">
+        </a>
+        <p class="memory-text">คลิกเพื่อดู timeline ของเรา 💝</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Lightbox สำหรับขยายรูปใหญ่ -->
-    <div id="lightbox" class="lightbox">
-        <span id="close-lightbox">&times;</span>
-        <img class="lightbox-img" src="">
-    </div>
+  <!-- Video Modal -->
+<div id="video-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:9999;">
+  <video id="video-player" style="max-width:90%; max-height:70%; border-radius:12px;" controls>
+    <source src="videos/1.mp4" type="video/mp4">
+    เบราว์เซอร์คุณไม่รองรับการเล่นวิดีโอ
+  </video>
+</div>
+  <!-- เพลง -->
+  <audio id="bg-music" src="music/3.mp3" loop></audio>
+  <button id="music-toggle" class="music-btn">
+    <img id="music-icon" src="images/sound-off.png" alt="toggle music">
+  </button>
 
-    <!-- เชื่อม JS -->
-    <script src="script.js"></script>
+  <script>
+    // ================= Video Modal =================
+const videoModal = document.getElementById('video-modal');
+const videoPlayer = document.getElementById('video-player');
+const playBtn0 = document.getElementById('play-video-0');
+
+playBtn0.addEventListener('click', ()=>{
+  videoModal.style.display = 'flex';
+  videoPlayer.play();
+});
+
+// คลิก background ปิด + pause + reset
+videoModal.addEventListener('click', (e)=>{
+  if(e.target === videoModal){
+    videoPlayer.pause();
+    videoPlayer.currentTime = 0; // รีเซ็ตวิดีโอไปเริ่มต้น
+    videoModal.style.display = 'none';
+  }
+});
+
+    // ================= Music Toggle =================
+    const music = document.getElementById("bg-music");
+    const toggleBtn = document.getElementById("music-toggle");
+    const musicIcon = document.getElementById("music-icon");
+    let isPlaying = false;
+
+    toggleBtn.addEventListener("click", () => {
+      if (!isPlaying) {
+        music.volume = 0.3;
+        music.play().then(() => {
+          isPlaying = true;
+          musicIcon.src = "images/sound-on.png";
+        }).catch(err => console.log("เล่นเพลงไม่ได้:", err));
+      } else {
+        music.pause();
+        isPlaying = false;
+        musicIcon.src = "images/sound-off.png";
+      }
+    });
+  </script>
 </body>
 </html>
