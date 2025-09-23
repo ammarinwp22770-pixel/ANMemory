@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แฟนสร้างคำตอบให้เรา 💖</title>
+<style>
+body{
+  font-family:sans-serif;
+  text-align:center;
+  background:linear-gradient(135deg,#ff9cc2,#ffc0cb);
+  color:#fff;
+  padding:20px;
+}
+button{
+  padding:10px 20px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+button.selected{
+  background:#00f;
+  color:#fff;
+}
+#link-container{
+  margin-top:20px;
+  display:none;
+  word-break: break-all;
+  background:rgba(255,255,255,0.2);
+  padding:10px;
+  border-radius:8px;
+}
+.copy-btn{
+  margin-top:10px;
+  background:#fff;
+  color:#ff1493;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+<h2>แฟนสร้างคำตอบให้เรา 💖</h2>
+<div id="questions"></div>
+<button id="send-link">สร้างลิงก์ให้เราเล่น</button>
+
+<div id="link-container">
+  <p>นี่คือลิงก์สำหรับเล่นต่อ:</p>
+  <input type="text" id="generated-link" readonly style="width:80%; padding:5px;">
+  <br>
+  <button class="copy-btn" id="copy-link">คัดลอกลิงก์</button>
+</div>
+
+<script>
+const questions = [
+  {q:"เราพบกันครั้งแรกที่ไหน?", a:["ร้านกาแฟ","มหาวิทยาลัย","สวนสาธารณะ","ร้านหนังสือ"]},
+  {q:"สีโปรดของแฟนคุณคือ?", a:["ฟ้า","ชมพู","เขียว","ม่วง"]},
+  {q:"อาหารจานโปรดคืออะไร?", a:["พิซซ่า","ส้มตำ","ซูชิ","เบอร์เกอร์"]},
+  {q:"ชื่อเล่นแฟนคือ?", a:["เฟอ","ช้อน","ส้อม","มิก"]},
+  {q:"วันเกิดแฟนคือเดือน?", a:["ม.ค.","ก.ค.","ก.พ.","ธ.ค."]},
+  {q:"สัตว์ที่แฟนชอบที่สุด?", a:["แมว","สุนัข","นก","ปลา"]},
+  {q:"เพลงโปรดคือ?", a:["เพลงรัก","เพลงแดนซ์","เพลงเศร้า","เพลงสากล"]},
+  {q:"สถานที่เที่ยวโปรดคือ?", a:["ทะเล","ภูเขา","เมือง","สวนสนุก"]},
+  {q:"สีลิปสติกที่ชอบ?", a:["แดง","ชมพู","ส้ม","ม่วง"]},
+  {q:"เครื่องดื่มโปรดคือ?", a:["ชา","กาแฟ","น้ำผลไม้","น้ำอัดลม"]}
+];
+
+const answers = [];
+const container = document.getElementById("questions");
+
+questions.forEach((q,i)=>{
+  const div = document.createElement("div");
+  div.innerHTML = `<p>${q.q}</p>`;
+  q.a.forEach((ans,j)=>{
+    const btn = document.createElement("button");
+    btn.textContent = ans;
+    btn.onclick = ()=>{
+      answers[i] = j;
+      Array.from(div.querySelectorAll("button")).forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+    };
+    div.appendChild(btn);
+  });
+  container.appendChild(div);
+});
+
+document.getElementById("send-link").onclick = ()=>{
+  if(answers.length !== questions.length || answers.includes(undefined)){
+    alert("กรุณาเลือกคำตอบให้ครบทุกข้อ!");
+    return;
+  }
+  const params = answers.map((a,i)=>`a${i}=${a}`).join("&");
+  // กำหนด URL public ของ player-quiz.html (ปรับตามที่อัป GitHub Pages)
+  const baseUrl = "https://ammarinwp22770-pixel.github.io/quiz/player-quiz.html";
+  const url = `${baseUrl}?${params}`;
+
+  const linkContainer = document.getElementById("link-container");
+  const generatedLink = document.getElementById("generated-link");
+  linkContainer.style.display = "block";
+  generatedLink.value = url;
+};
+
+// ปุ่มคัดลอกลิงก์
+document.getElementById("copy-link").onclick = ()=>{
+  const generatedLink = document.getElementById("generated-link");
+  generatedLink.select();
+  generatedLink.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  alert("คัดลอกลิงก์เรียบร้อย ✅");
+};
+</script>
+</body>
+</html>

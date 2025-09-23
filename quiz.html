@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เกมตอบคำถามของเรา 💕</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ff9cc2, #ffc0cb);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin:0;
+      color:#fff;
+    }
+    .quiz-container {
+      background:#ff69b4;
+      padding:30px;
+      border-radius:12px;
+      width:90%;
+      max-width:500px;
+      text-align:center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+    .question {
+      font-size:1.3rem;
+      margin-bottom:20px;
+    }
+    .answer-btn {
+      display:block;
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:1rem;
+      background:#fff;
+      color:#ff1493;
+      transition: transform 0.2s;
+    }
+    .answer-btn:hover {
+      transform: scale(1.05);
+    }
+    #next-btn {
+      margin-top:15px;
+      padding:10px 20px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background:#fff;
+      color:#ff1493;
+      font-weight:bold;
+    }
+    #score {
+      margin-top:15px;
+      font-size:1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <h2>เกมตอบคำถามของเรา 💖</h2>
+    <p class="question" id="question-text">คำถาม</p>
+    <div id="answers"></div>
+    <button id="next-btn">ถัดไป</button>
+    <p id="score"></p>
+  </div>
+
+<script>
+const questions = [
+  {q: "เราพบกันครั้งแรกที่ไหน?", a:["ร้านกาแฟ","มหาวิทยาลัย","สวนสาธารณะ","ร้านหนังสือ"], correct:null},
+  {q: "สีโปรดของแฟนคุณคือ?", a:["ฟ้า","ชมพู","เขียว","ม่วง"], correct:null},
+  {q: "อาหารจานโปรดคืออะไร?", a:["พิซซ่า","ส้มตำ","ซูชิ","เบอร์เกอร์"], correct:null},
+  {q: "ชื่อเล่นแฟนคือ?", a:["เฟอ","ช้อน","ส้อม","มิก"], correct:null},
+  {q: "วันเกิดแฟนคือเดือน?", a:["ม.ค.","ก.ค.","ก.พ.","ธ.ค."], correct:null},
+  {q: "สัตว์ที่แฟนชอบที่สุด?", a:["แมว","สุนัข","นก","ปลา"], correct:null},
+  {q: "เพลงโปรดคือ?", a:["เพลงรัก","เพลงแดนซ์","เพลงเศร้า","เพลงสากล"], correct:null},
+  {q: "สถานที่เที่ยวโปรดคือ?", a:["ทะเล","ภูเขา","เมือง","สวนสนุก"], correct:null},
+  {q: "สีลิปสติกที่ชอบ?", a:["แดง","ชมพู","ส้ม","ม่วง"], correct:null},
+  {q: "เครื่องดื่มโปรดคือ?", a:["ชา","กาแฟ","น้ำผลไม้","น้ำอัดลม"], correct:null},
+];
+
+let current = 0;
+let score = 0;
+let mode = 'fan'; // โหมดเริ่มแฟนตอบคำถาม
+
+const questionText = document.getElementById('question-text');
+const answersDiv = document.getElementById('answers');
+const nextBtn = document.getElementById('next-btn');
+const scoreText = document.getElementById('score');
+
+function showQuestion(index){
+  const q = questions[index];
+  questionText.textContent = q.q;
+  answersDiv.innerHTML = '';
+  q.a.forEach((ans,i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = ans;
+    btn.className = 'answer-btn';
+    btn.onclick = ()=>{
+      Array.from(answersDiv.children).forEach(b=>b.disabled=true);
+      
+      if(mode === 'fan'){
+        // แฟนตอบ → บันทึกเป็นคำตอบถูก
+        q.correct = i;
+        btn.style.background = "#00f"; // แฟนเลือกสีฟ้า
+        btn.style.color = "#fff";
+      } else {
+        // โหมดเราตอบ → ใช้คำตอบแฟน
+        if(i===q.correct){
+          btn.style.background="green";
+          btn.style.color="#fff";
+          score++;
+        } else {
+          btn.style.background="red";
+          btn.style.color="#fff";
+        }
+      }
+
+      scoreText.textContent = mode==='fan' ? `แฟนเลือกคำตอบของเราแล้ว` : `คะแนน: ${score}/${questions.length}`;
+    };
+    answersDiv.appendChild(btn);
+  });
+}
+
+nextBtn.addEventListener('click', ()=>{
+  current++;
+  if(current < questions.length){
+    showQuestion(current);
+  } else {
+    if(mode==='fan'){
+      alert("แฟนตอบคำถามเรียบร้อย! ตอนนี้คุณมาตอบคำถามของแฟน 🎉");
+      mode='player'; // เปลี่ยนโหมดให้เราเล่น
+      current=0;
+      score=0;
+      showQuestion(current);
+      scoreText.textContent = '';
+    } else {
+      alert(`จบเกม! คะแนนของคุณคือ ${score}/${questions.length} 🎉`);
+      // รีเซ็ตเกม
+      current=0;
+      score=0;
+      mode='fan';
+      questions.forEach(q=>q.correct=null);
+      showQuestion(current);
+      scoreText.textContent = '';
+    }
+  }
+});
+
+// เริ่มเกม
+showQuestion(current);
+</script>
+
+</body>
+</html>
