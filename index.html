@@ -6,6 +6,140 @@
   <title>Memory ของเรา 💖</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ==================== Loading Screen ==================== */
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .heart {
+      font-size: 4rem;
+      color: #ff1493;
+      animation: heartbeat 1s infinite;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255,20,147,0.4);
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.2); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.2); }
+    }
+
+    .loader-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .progress-bar {
+      width: 250px;
+      height: 15px;
+      background: #ffe4ec;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    }
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff69b4, #ff1493);
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+
+    /* ==================== พื้นหลังน่ารัก ==================== */
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #ffe6f0, #fff);
+      overflow-x: hidden;
+    }
+
+    .floating {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: floatUp 6s linear infinite;
+      opacity: 0.7;
+      user-select: none;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* ==================== Main ==================== */
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeIn 1.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ff1493;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .memory-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .memory-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      width: 220px;
+      cursor: pointer;
+    }
+.memory-card:hover {
+  transform: translateY(-10px) scale(1.03) rotate(-1deg);
+  box-shadow: 0 8px 20px rgba(255,20,147,0.3), 0 0 20px rgba(255,105,180,0.2);
+}
+    .memory-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .memory-text {
+      font-size: 1.1rem;
+      color: #ff1493;
+      padding: 12px;
+      font-weight: bold;
+    }
+
+    /* ==================== ปุ่มเพลง ==================== */
     .music-btn {
       position: fixed;
       bottom: 20px;
@@ -20,34 +154,287 @@
       width: 100%;
       height: 100%;
     }
-    .memory-text {
-      font-size: 1.2rem;
-      color: #ff1493;
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+    /* ================= Floating Text Style ================= */
+    .floating-text {
+    position: fixed;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff1493;
+    text-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+    animation: floatUp 5s linear forwards;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
     }
-    .memory-text:hover {
-      transform: scale(1.05);
+    50% {
+      transform: translateY(-100px) scale(1.2);
+      opacity: 0.8;
     }
+    100% {
+      transform: translateY(-250px) scale(0.8);
+      opacity: 0;
+    }
+  }
+/* ================= Timeline Title ================= */
+.timeline-line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* ให้ตัวอักษรอยู่บน */
+  gap: 25px;
+  margin: 80px 0;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+/* เส้นเชื่อม */
+/* เส้นเชื่อมใต้ตัวอักษร */
+.timeline-line::before {
+  content: "";
+  position: absolute;
+  bottom: -20px; /* ใต้ตัวอักษร */
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background: linear-gradient(90deg, #ff9ccd, #ff69b4, #ff1493);
+  border-radius: 5px;
+  z-index: 0;
+  animation: glowLine 3s infinite alternate;
+}
+
+/* ตัวอักษร */
+.timeline-line {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* ตัวอักษรอยู่ชิดเส้น */
+  gap: 25px;
+  margin: 80px 0;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.timeline-line span {
+  position: relative;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff1493;
+  text-shadow: 0 0 8px rgba(255,105,180,0.6);
+  opacity: 0;
+  transform: translateY(0); /* เริ่มจาก baseline */
+  animation: popUp 0.6s ease forwards;
+  z-index: 1;
+}
+
+/* Animation popUp แบบ subtle ให้ไม่ลอยสูง */
+@keyframes popUp {
+  0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+  60% { opacity: 1; transform: translateY(-5px) scale(1.05); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* เส้นเชื่อม gradient */
+.timeline-line::before {
+  content: "";
+  position: absolute;
+  bottom: 0; /* ชิดตัวอักษรเลย */
+  left: 5%;
+  right: 5%;
+  height: 4px;
+  background: linear-gradient(90deg, #ff9ccd, #ff69b4, #ff1493);
+  border-radius: 5px;
+  z-index: 0;
+  animation: glowLine 3s infinite alternate;
+}
+
+/* เส้น glow animation */
+@keyframes glowLine {
+  0% { box-shadow: 0 0 5px #ff69b4, 0 0 10px #ff69b4; }
+  100% { box-shadow: 0 0 15px #ff1493, 0 0 25px #ff1493; }
+}
+
+/* หัวใจ */
+.timeline-line .heart {
+  font-size: 1.8rem;
+  animation: heartbeat 1s infinite;
+}
+
+/* Animation */
+@keyframes popUp {
+  0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+  60% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+@keyframes glowLine {
+  0% { box-shadow: 0 0 5px #ff69b4, 0 0 10px #ff69b4; }
+  100% { box-shadow: 0 0 15px #ff1493, 0 0 25px #ff1493; }
+}
+@keyframes popupBounce {
+  0% { transform: scale(0.5); opacity:0; }
+  60% { transform: scale(1.1); opacity:1; }
+  100% { transform: scale(1); }
+}
+
+/* ================= Navbar ================= */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #ff9ccd, #ff69b4, #ff1493);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  z-index: 1000;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255,255,255,0.6);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #ffe6f0;
+  text-shadow: 0 0 8px #fff;
+}
+
+/* Hamburger (มือถือ) */
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+    width: 200px;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    display: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  .nav-links.active {
+    display: flex;
+  }
+  .hamburger {
+    display: block;
+  }
+}
+/* Letter */
+.badge {
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 5px;
+}
   </style>
 </head>
 <body>
-  <canvas id="particles"></canvas>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="heart">💖</div>
+    <div class="loader-text">กำลังโหลดความทรงจำของเรา 💕</div>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+  </div>
 
-  <div class="container">
-    <h1>Happy Anniversary 💕</h1>
+  <!-- Floating hearts -->
+  <div class="floating" style="left:10%">💖</div>
+  <div class="floating" style="left:30%; animation-delay:2s;">💕</div>
+  <div class="floating" style="left:60%; animation-delay:4s;">🌸</div>
+  <div class="floating" style="left:80%; animation-delay:6s;">💝</div>
+
+<nav class="navbar">
+  <div class="logo">💖 WebsiteA&P</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="timeline.html">Timeline</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <!-- Alert Num -->
+    <li>
+  <a href="letters.html">
+    Letters 
+    <span id="letter-badge" class="badge">0</span>
+  </a>
+</li>
+    <li><a href="#love-points-display">Love Points</a></li>
+  </ul>
+  <div class="hamburger">☰</div>
+</nav>
+
+  <!-- Main Content -->
+  <div class="container" style="display:none;">
+    <!-- Title Happy Anniversary แบบ Timeline -->
+<div class="timeline-line">
+  <span>H</span>
+  <span>A</span>
+  <span>P</span>
+  <span>P</span>
+  <span>Y</span>
+  <span class="heart">💖</span>
+  <span>A</span>
+  <span>N</span>
+  <span>N</span>
+  <span>I</span>
+  <span>V</span>
+  <span>E</span>
+  <span>R</span>
+  <span>S</span>
+  <span>A</span>
+  <span>R</span>
+  <span>Y</span>
+</div>
+<!-- แสดงคะแนน Love Points -->
+<div id="love-points-display" style="position:fixed; top:20px; right:20px; background:#ff69b4; color:#fff; padding:10px 15px; border-radius:15px; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+  Love Points: 0 ❤️
+</div>
 
     <div class="memory-grid">
-      <!-- กรอบรูป 1 -->
       <div class="memory-card" data-index="0">
         <img src="images/2.avif" alt="รูปแรก" class="memory-img" id="play-video-0">
         <p class="memory-text">จุดเริ่มต้นมาจากแอปเปิ้ลลูกนึง (แต่ลูกไหน?)</p>
       </div>
 
-      <!-- กรอบรูป 2 = กดแล้วไป timeline.html -->
       <div class="memory-card" data-index="1">
         <a href="timeline.html">
           <img src="images/1.png" alt="รูปของเรา" class="memory-img">
@@ -56,25 +443,106 @@
       </div>
 
       <div class="memory-card" data-index="1">
-  <a href="fan-quiz.html">
-    <img src="images/1.png" alt="เกมคำถาม" class="memory-img">
-  </a>
-  <p class="memory-text">กดที่นี่เพื่อเล่นเกมตอบคำถาม 🎮</p>
+        <a href="gallery.html">
+          <img src="images/photo-album.png" alt="แกเลอรี่" class="memory-img">
+        </a>
+        <p class="memory-text">คลังรูปภาพ 🌈</p>
+      </div>
+<!-- Daily Love Card -->
+<div class="memory-card" id="daily-love-card">
+  <img src="images/heart.jpg" alt="รับความรัก" class="memory-img">
+  <p class="memory-text">กดเพื่อรับความรักประจำวัน 💌</p>
+  <p id="love-countdown" style="color:#ff1493; font-weight:bold; margin-top:5px;"></p>
 </div>
 
-    </div>
-  </div>
+<!-- Anniversary Gift Card -->
+<div class="memory-card" id="anniversary-card">
+  <img src="images/16.webp" alt="ของขวัญครบรอบ" class="memory-img">
+  <p class="memory-text">??????</p>
+  <p id="anniversary-countdown" style="color:#ff1493; font-weight:bold; margin-top:5px;"></p>
+</div>
 
-  <!-- กรอบรูป 3 = เกมตอบคำถาม -->
+<!-- Popup ของขวัญครบรอบ -->
+<div id="anniversary-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); justify-content:center; align-items:center; z-index:9999;">
+  <div class="popup-inner" style="background:#fff; padding:30px; border-radius:20px; max-width:350px; text-align:center; font-weight:bold; box-shadow:0 5px 20px rgba(0,0,0,0.3); display:flex; flex-direction:column; gap:15px;">
+    <img src="images/16.webp" alt="ของขวัญ" style="width:100%; border-radius:15px;">
+    <p>💖 สุขสันต์วันครบรอบ 1 ปี! 💖</p>
+    <button id="close-anniversary" style="padding:8px 16px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-weight:bold; cursor:pointer;">ปิด 🎁</button>
+  </div>
+</div>
+<script>
+  // Anniversary Card
+const anniversaryCard = document.getElementById('anniversary-card');
+const anniversaryPopup = document.getElementById('anniversary-popup');
+const closeAnniversary = document.getElementById('close-anniversary');
+const anniversaryCountdown = document.getElementById('anniversary-countdown');
+
+const testMode = false;
+const anniversaryDate = testMode ? new Date() : new Date(2025, 10, 16, 0, 0, 0);
+
+function updateAnniversaryCountdown() {
+  const now = new Date();
+  const diff = anniversaryDate - now;
+
+  if(diff > 0){
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const seconds = Math.floor((diff % (1000*60)) / 1000);
+    anniversaryCountdown.textContent = `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วิ`;
+    anniversaryCard.style.pointerEvents = 'none';
+    anniversaryCard.style.opacity = '0.6';
+  } else {
+    anniversaryCountdown.textContent = "🎉 วันนี้เปิดของขวัญได้แล้ว! 🎉";
+    anniversaryCard.style.pointerEvents = 'auto';
+    anniversaryCard.style.opacity = '1';
+  }
+
+  setTimeout(updateAnniversaryCountdown, 1000);
+}
+updateAnniversaryCountdown();
+
+anniversaryCard.addEventListener('click', () => {
+  if(new Date() >= anniversaryDate){
+    anniversaryPopup.style.display = 'flex';
+  }
+});
+closeAnniversary.addEventListener('click', () => {
+  anniversaryPopup.style.display = 'none';
+});
+
+dailyLoveCard.addEventListener('click', () => {
+  dailyLoveCard.classList.add('opening');
+
+  setTimeout(() => {
+    dailyLoveCard.classList.remove('opening');
+    // แสดง popup หลัง animation
+    lovePopup.style.display = 'flex';
+  }, 600);
+});
+
+</script>
+<!-- Popup love message -->
+<div id="love-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:25px 30px; border-radius:20px; max-width:300px; text-align:center; font-weight:bold; font-size:1.2rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); animation:popupBounce 0.4s ease; display:flex; flex-direction:column; gap:15px;">
+    <p id="love-message" style="margin:0;"></p>
+    <button id="close-love-popup" style="padding:8px 16px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-weight:bold; cursor:pointer;">ปิด 💖</button>
+  </div>
+</div>
+
+ </div>
+</div>
+  
 
 
   <!-- Video Modal -->
-<div id="video-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:9999;">
-  <video id="video-player" style="max-width:90%; max-height:70%; border-radius:12px;" controls>
-    <source src="videos/1.mp4" type="video/mp4">
-    เบราว์เซอร์คุณไม่รองรับการเล่นวิดีโอ
-  </video>
-</div>
+  <div id="video-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:9999;">
+    <video id="video-player" style="max-width:90%; max-height:70%; border-radius:12px;" controls>
+      <source src="videos/1.mp4" type="video/mp4">
+      เบราว์เซอร์คุณไม่รองรับการเล่นวิดีโอ
+    </video>
+  </div>
+
   <!-- เพลง -->
   <audio id="bg-music" src="music/3.mp3" loop></audio>
   <button id="music-toggle" class="music-btn">
@@ -82,24 +550,52 @@
   </button>
 
   <script>
+    
+// ================= Loading Animation =================
+const loadingScreen = document.getElementById("loading-screen");
+const progressBar = document.getElementById("progress");
+const container = document.querySelector(".container");
+
+if (!sessionStorage.getItem("visited")) {
+  // ยังไม่เคยเข้ามาใน session นี้ → โชว์ loading
+  let progress = 0;
+  let loadingInterval = setInterval(() => {
+    progress += 5;
+    progressBar.style.width = progress + "%";
+    if (progress >= 100) {
+      clearInterval(loadingInterval);
+      setTimeout(() => {
+        loadingScreen.classList.add("hidden");
+        container.style.display = "block";
+        sessionStorage.setItem("visited", "true"); // บันทึกแค่ใน session
+      }, 500);
+    }
+  }, 150);
+} else {
+  // เคยเข้ามาแล้วใน session นี้ → ไม่ต้องโชว์ loading
+  loadingScreen.style.display = "none";
+  container.style.display = "block";
+}
+
+
+
     // ================= Video Modal =================
-const videoModal = document.getElementById('video-modal');
-const videoPlayer = document.getElementById('video-player');
-const playBtn0 = document.getElementById('play-video-0');
+    const videoModal = document.getElementById('video-modal');
+    const videoPlayer = document.getElementById('video-player');
+    const playBtn0 = document.getElementById('play-video-0');
 
-playBtn0.addEventListener('click', ()=>{
-  videoModal.style.display = 'flex';
-  videoPlayer.play();
-});
+    playBtn0.addEventListener('click', ()=>{
+      videoModal.style.display = 'flex';
+      videoPlayer.play();
+    });
 
-// คลิก background ปิด + pause + reset
-videoModal.addEventListener('click', (e)=>{
-  if(e.target === videoModal){
-    videoPlayer.pause();
-    videoPlayer.currentTime = 0; // รีเซ็ตวิดีโอไปเริ่มต้น
-    videoModal.style.display = 'none';
-  }
-});
+    videoModal.addEventListener('click', (e)=>{
+      if(e.target === videoModal){
+        videoPlayer.pause();
+        videoPlayer.currentTime = 0;
+        videoModal.style.display = 'none';
+      }
+    });
 
     // ================= Music Toggle =================
     const music = document.getElementById("bg-music");
@@ -120,6 +616,227 @@ videoModal.addEventListener('click', (e)=>{
         musicIcon.src = "images/sound-off.png";
       }
     });
+    function fadeMusic(volTarget, duration=1000){
+  const step = (volTarget - music.volume) / (duration/50);
+  const interval = setInterval(()=>{
+    music.volume += step;
+    if((step>0 && music.volume >= volTarget) || (step<0 && music.volume <= volTarget)){
+      music.volume = volTarget;
+      clearInterval(interval);
+    }
+  },50);
+}
+     // ================= Floating Text =================
+      const floatingTexts = [
+    "เค้ารักเธอ 💖",
+    "ขอให้มีความสุข 🌸",
+    "อยู่กับเค้านานๆนะ 💕",
+    "คิดถึงเธอทุกวัน 😘",
+    "You & Me Forever ✨",
+    "สร้างอนาคตไปด้วยกันนะ 💌",
+    "N.Arm love P.Pin",
+    "P.Pin love N.Arm"
+  ];
+
+  function createFloatingText() {
+    const text = document.createElement("div");
+    text.className = "floating-text";
+    text.innerText = floatingTexts[Math.floor(Math.random() * floatingTexts.length)];
+
+    // สุ่มตำแหน่ง X
+    text.style.left = Math.random() * 80 + 10 + "vw"; 
+    text.style.bottom = "-30px"; 
+
+    document.body.appendChild(text);
+
+    // ลบเมื่อจบ animation
+    setTimeout(() => {
+      text.remove();
+    }, 5000);
+  }
+
+  // สุ่มสร้างข้อความทุก ๆ 2-4 วินาที
+  setInterval(createFloatingText, 2000 + Math.random() * 2000);
+
+const dailyLoveCard = document.getElementById('daily-love-card');
+const lovePopup = document.getElementById('love-popup');
+const loveMessage = document.getElementById('love-message');
+const closeLovePopup = document.getElementById('close-love-popup');
+const countdownEl = document.getElementById('love-countdown');
+
+const loveMessages = [
+  "วันนี้เธอคือคนที่น่ารักที่สุด 💖",
+  "เค้ารักเธอมากกว่าเมื่อวาน 💕",
+  "ส่งจุ๊บให้นะค้าบ 😘",
+  "ขอให้วันนี้เธอเต็มไปด้วยความสุข 🌸",
+  "เธอคือความสุขของเค้า ✨",
+  "กอดเสมือนจริงจากใจ 💌"
+];
+
+// เช็คสถานะและรีเซ็ตทุกวัน 6 โมงเช้า
+function checkDailyLoveStatus() {
+  const now = new Date();
+  let nextReset = new Date();
+  nextReset.setHours(6,0,0,0); // ตั้งเป็น 6 โมงเช้า
+
+  if (now >= nextReset) { 
+    // ถ้าเลย 6 โมงเช้าแล้ว รีเซ็ตวันถัดไป
+    nextReset.setDate(nextReset.getDate() + 1);
+  }
+
+  const storedReset = localStorage.getItem("loveNextReset");
+
+  if (!storedReset || now >= new Date(storedReset)) {
+    // ยังไม่ได้กด หรือ ถึงเวลา reset
+    dailyLoveCard.style.pointerEvents = 'auto';
+    dailyLoveCard.style.opacity = '1';
+    countdownEl.innerText = '';
+  } else {
+    // กดแล้ววันนี้
+    dailyLoveCard.style.pointerEvents = 'none';
+    dailyLoveCard.style.opacity = '0.6';
+    updateCountdown(new Date(storedReset));
+  }
+}
+
+// กดรับ Daily Love
+// กด Daily Love
+const pointsDisplay = document.getElementById("love-points-display");
+
+// ฟังก์ชันอัปเดตคะแนนบนหน้าจอ
+function updatePointsDisplay() {
+  const lovePoints = parseInt(localStorage.getItem("lovePoints")) || 0;
+  pointsDisplay.innerHTML = `Love Points: ${lovePoints} ❤️`;
+}
+
+// เรียกตอนโหลดหน้า
+updatePointsDisplay();
+
+// เมื่อกด Daily Love
+dailyLoveCard.addEventListener('click', () => {
+  const today = new Date().toDateString();
+
+  let lovePoints = parseInt(localStorage.getItem("lovePoints")) || 0;
+  lovePoints += 10;
+  localStorage.setItem("lovePoints", lovePoints);
+
+  // อัปเดตโชว์คะแนนทันที
+  updatePointsDisplay();
+
+  // แสดง popup ข้อความ + รางวัล
+  let message = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+  let rewardMessage = `${message}<br>คุณมี Love Points ทั้งหมด: ${lovePoints} ❤️`;
+
+  if(lovePoints >= 50 && !localStorage.getItem("reward50")) {
+    rewardMessage += `<br>🎉 คุณปลดล็อก ข้อความพิเศษแล้ว 💌`;
+    localStorage.setItem("reward50", "true");
+  }
+  if(lovePoints >= 100 && !localStorage.getItem("reward100")) {
+    rewardMessage += `<br>🌸 คุณปลดล็อก รูปความทรงจำแล้ว`;
+    localStorage.setItem("reward100", "true");
+  }
+  if(lovePoints >= 200 && !localStorage.getItem("reward200")) {
+    rewardMessage += `<br>🎬 คุณปลดล็อก คลิปวีดีโอสั้นแล้ว`;
+    localStorage.setItem("reward200", "true");
+  }
+
+  loveMessage.innerHTML = rewardMessage;
+  lovePopup.style.display = 'flex';
+
+  checkDailyLoveStatus();
+});
+
+
+
+// Countdown
+function updateCountdown(resetTime){
+  const now = new Date();
+  let diff = resetTime - now;
+
+  if(diff < 0) diff = 0;
+
+  const hours = Math.floor(diff / (1000*60*60));
+  const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+  const seconds = Math.floor((diff % (1000*60)) / 1000);
+
+  countdownEl.innerText = `รอรับใหม่อีกครั้งใน ${hours}ชม. ${minutes}นาที ${seconds}วิ`;
+
+  setTimeout(()=>updateCountdown(resetTime), 1000);
+}
+
+dailyLoveCard.addEventListener('click', () => {
+  const today = new Date().toDateString();
+
+  // โหลดคะแนนสะสม
+  let lovePoints = parseInt(localStorage.getItem("lovePoints")) || 0;
+  let loveHistory = JSON.parse(localStorage.getItem("loveHistory")) || [];
+
+  // เพิ่มคะแนน
+  lovePoints += 10; // กดครั้งหนึ่งได้ 10 แต้ม
+  loveHistory.push({ date: today, points: 10 });
+
+  // บันทึกลง localStorage
+  localStorage.setItem("lovePoints", lovePoints);
+  localStorage.setItem("loveHistory", JSON.stringify(loveHistory));
+
+  // ตรวจสอบรางวัล
+  if(lovePoints >= 50 && !localStorage.getItem("reward50")) {
+    alert("คุณปลดล็อก ข้อความพิเศษแล้ว 💌");
+    localStorage.setItem("reward50", "true");
+  }
+
+  if(lovePoints >= 100 && !localStorage.getItem("reward100")) {
+    alert("คุณปลดล็อก รูปความทรงจำแล้ว 🌸");
+    localStorage.setItem("reward100", "true");
+  }
+
+  if(lovePoints >= 200 && !localStorage.getItem("reward200")) {
+    alert("คุณปลดล็อก คลิปวีดีโอสั้นแล้ว 🎬");
+    localStorage.setItem("reward200", "true");
+  }
+
+  // แสดง popup คะแนน
+  loveMessage.innerHTML = `วันนี้คุณได้รับ 10 ❤️ Love Points!<br>รวมทั้งหมด: ${lovePoints} ❤️`;
+  lovePopup.style.display = 'flex';
+
+  // ปิด card / เริ่ม countdown
+  checkDailyLoveStatus();
+});
+
+
+// ปิด popup
+closeLovePopup.addEventListener('click', () => {
+  lovePopup.style.display = 'none';
+});
+
+// เรียกตอนโหลดหน้า
+checkDailyLoveStatus();
+
+// Toggle Hamburger Menu
+const hamburger = document.querySelector(".hamburger");
+const navLinks = document.querySelector(".nav-links");  
+
+hamburger.addEventListener("click", () => {
+  navLinks.classList.toggle("active");
+});
+
+function updateLetterBadge() {
+  const badge = document.getElementById("letter-badge");
+  let count = parseInt(localStorage.getItem("letterCount") || "0");
+  badge.textContent = count;
+}
+updateLetterBadge();
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", function(e) {
+  if (e.key === "F12" || 
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") ||
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") ||
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "j")) {
+    e.preventDefault();
+    alert("การเปิด DevTools ถูกปิดชั่วคราว 🚫");
+  }
+});
+
   </script>
 </body>
 </html>

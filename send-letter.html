@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Letter 💌</title>
+  <link rel="stylesheet" href="send-letter.css">
+</head>
+<body>
+  <h1>✍ เขียนจดหมายถึงแฟน</h1>
+
+  <form id="letter-form">
+    <input type="text" id="sender" placeholder="ชื่อผู้ส่ง" required><br>
+    <input type="text" id="title" placeholder="หัวข้อจดหมาย" required><br>
+    <textarea id="message" placeholder="เขียนข้อความ..." required></textarea><br>
+    <button type="submit">ส่ง 💌</button>
+  </form>
+
+  <a href="letters.html" class="back-btn">📬 กลับกล่องจดหมาย</a>
+
+  <script>
+    const form = document.getElementById("letter-form");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const sender = document.getElementById("sender").value;
+      const title = document.getElementById("title").value;
+      const message = document.getElementById("message").value;
+
+      const newLetter = {
+        sender,
+        title,
+        message,
+        date: new Date().toLocaleString()
+      };
+
+      // เก็บใน localStorage
+      const letters = JSON.parse(localStorage.getItem("letters") || "[]");
+      letters.push(newLetter);
+      localStorage.setItem("letters", JSON.stringify(letters));
+
+      // เพิ่ม badge count
+      let count = parseInt(localStorage.getItem("letterCount") || "0");
+      count++;
+      localStorage.setItem("letterCount", count);
+
+      alert("ส่งจดหมายแล้ว 💌");
+      form.reset();
+    });
+  </script>
+</body>
+</html>

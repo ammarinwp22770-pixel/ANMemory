@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Albums 💖</title>
+<button id="back-index-btn">&#8592; หน้าแรก</button>
+<style>
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg,#ffe6f0,#fff);
+  text-align: center;
+}
+h1 {
+  color: #ff1493;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px #ff69b4;
+}
+.album-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  padding: 0 20px 50px 20px;
+}
+.album-card {
+  width: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(255,20,147,0.2);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.album-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(255,20,147,0.3);
+}
+.album-card img {
+  width: 100%;
+  display: block;
+  height: 140px;
+  object-fit: cover;
+}
+.album-content {
+  padding: 12px;
+}
+.album-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ff1493;
+  margin-bottom: 5px;
+}
+.album-desc {
+  font-size: 0.95rem;
+  color: #ff69b4;
+}
+.view-all-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #ff69b4;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+.view-all-btn:hover {
+  background: #ff1493;
+}
+
+/* Modal */
+#album-modal {
+  display: none;
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#modal-container {
+  position: relative;
+  max-width: 90%;
+  max-height: 80%;
+  text-align: center;
+}
+#modal-img {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(255,20,147,0.3);
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+#album-name {
+  color: #fff;
+  font-size: 1.5rem;
+  margin: 10px 0;
+  text-shadow: 0 0 10px #ff69b4;
+}
+#image-counter {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+.close-btn {
+  position: fixed;
+  top: 15px;
+  right: 25px;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10000;
+}
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,20,147,0.6);
+  color: #fff;
+  border: none;
+  font-size: 2rem;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 50%;
+  user-select: none;
+}
+#prev-btn { left: -60px; }
+#next-btn { right: -60px; }
+
+#modal-grid {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+#modal-grid img {
+  width: 200px;
+  height: 200px; /* ให้เป็นสี่เหลี่ยมจัตุรัส */
+  object-fit: cover; /* ครอบเต็มแต่ไม่บิด */
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(255,20,147,0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#modal-grid img.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.next-album-btn {
+  margin-top: 15px;
+  padding: 8px 14px;
+  background: #ff69b4;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.next-album-btn:hover { background: #ff1493; }
+
+#back-index-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 10001;
+  padding: 8px 12px;
+  background: rgba(255,20,147,0.8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#back-index-btn:hover {
+  background: rgba(255,20,147,1);
+}
+</style>
+</head>
+<body>
+
+<h1>รวมคลังภาพของเรา ❤</h1>
+
+<div class="album-grid" id="album-grid">
+  <!-- ตัวอย่างอัลบั้ม -->
+  <div class="album-card" data-album="album1" data-name="เจอกันครั้งแรก">
+    <img src="images/album1/1.png" alt="Album 1">
+    <div class="album-content">
+      <div class="album-title">เจอกันครั้งแรก</div>
+      <div class="album-desc">ไม่ได้เที่ยว แต่อยู่โรงแรมฉ่ำ</div>
+      <button class="view-all-btn">ดูทั้งหมด</button>
+    </div>
+  </div>
+
+  <div class="album-card" data-album="album2" data-name="วันสำคัญ 💖">
+    <img src="images/album2/cover1.jpg" alt="Album 2">
+    <div class="album-content">
+      <div class="album-title">วันสำคัญ 💖</div>
+      <div class="album-desc">วันพิเศษของเราที่เก็บไว้</div>
+      <button class="view-all-btn">ดูทั้งหมด</button>
+    </div>
+  </div>
+
+  <div class="album-card" data-album="album3" data-name="ช่วงเวลาสนุก 🎉">
+    <img src="images/album3/cover1.jpg" alt="Album 3">
+    <div class="album-content">
+      <div class="album-title">ช่วงเวลาสนุก 🎉</div>
+      <div class="album-desc">รูปเล่น ๆ สนุก ๆ</div>
+      <button class="view-all-btn">ดูทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="album-modal">
+  <span class="close-btn" id="close-modal">&times;</span>
+  <div id="modal-container">
+    <button class="nav-btn" id="prev-btn">&#10094;</button>
+    <div id="album-name"></div>
+    <div id="image-counter"></div>
+    <img id="modal-img" src="">
+    <div id="modal-grid"></div>
+    <button class="nav-btn" id="next-btn">&#10095;</button>
+    <button class="next-album-btn" id="next-album-btn" style="display:none;">ไปอัลบั้มถัดไป</button>
+  </div>
+</div>
+
+<script>
+const albums = {
+  album1: ["images/album1/2.jpg","images/album1/3.jpg","images/album1/4.jpg","images/album1/5.jpg"],
+  album2: ["images/album2/1.jpg","images/album2/2.jpg","images/album2/3.jpg"],
+  album3: ["images/album3/1.jpg","images/album3/2.jpg","images/album3/3.jpg"]
+};
+const albumCards = document.querySelectorAll('.album-card');
+const albumModal = document.getElementById('album-modal');
+const modalImg = document.getElementById('modal-img');
+const albumName = document.getElementById('album-name');
+const imageCounter = document.getElementById('image-counter');
+const closeModal = document.getElementById('close-modal');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const modalGrid = document.getElementById('modal-grid');
+const viewAllBtns = document.querySelectorAll('.view-all-btn');
+const nextAlbumBtn = document.getElementById('next-album-btn');
+
+let albumKeys = Object.keys(albums);
+let currentAlbumKey = '';
+let currentAlbumIndex = 0;
+let currentIndex = 0;
+
+function fadeIn(){
+  modalImg.style.opacity = 0;
+  setTimeout(()=> modalImg.style.opacity = 1, 50);
+}
+function updateCounter(){
+  imageCounter.textContent = `รูป ${currentIndex+1} / ${currentAlbum.length}`;
+}
+function showImage(index){
+  modalImg.style.opacity = 0;
+  setTimeout(()=>{
+    modalImg.src = currentAlbum[index];
+    fadeIn();
+    updateCounter();
+  }, 200);
+}
+
+albumCards.forEach(card=>{
+  card.addEventListener('click',()=>{
+    currentAlbumKey = card.dataset.album;
+    currentAlbumIndex = albumKeys.indexOf(currentAlbumKey);
+    currentAlbum = albums[currentAlbumKey];
+    currentIndex = 0;
+    modalImg.style.display='block';
+    prevBtn.style.display='block';
+    nextBtn.style.display='block';
+    modalGrid.style.display='none';
+    nextAlbumBtn.style.display = (currentAlbumIndex < albumKeys.length-1)? 'block':'none';
+    modalImg.src = currentAlbum[currentIndex];
+    albumName.textContent = card.dataset.name;
+    albumModal.style.display='flex';
+    fadeIn();
+    updateCounter();
+  });
+});
+
+prevBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  currentIndex = (currentIndex - 1 + currentAlbum.length) % currentAlbum.length;
+  showImage(currentIndex);
+});
+nextBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  currentIndex = (currentIndex + 1) % currentAlbum.length;
+  showImage(currentIndex);
+});
+
+viewAllBtns.forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const card = btn.closest('.album-card');
+    const key = card.dataset.album;
+    const title = card.dataset.name;
+    const images = albums[key];
+    modalImg.style.display='none';
+    prevBtn.style.display='none';
+    nextBtn.style.display='none';
+    nextAlbumBtn.style.display = (albumKeys.indexOf(key) < albumKeys.length-1)? 'block':'none';
+    albumName.textContent = title;
+    modalGrid.innerHTML='';
+    modalGrid.style.display='flex';
+    images.forEach((src, idx)=>{
+      const img = document.createElement('img');
+      img.src=src;
+      modalGrid.appendChild(img);
+      setTimeout(()=>img.classList.add('show'), idx*150);
+    });
+    albumModal.style.display='flex';
+    imageCounter.textContent = `ทั้งหมด ${images.length} รูป`;
+  });
+});
+
+nextAlbumBtn.addEventListener('click', ()=>{
+  currentAlbumIndex++;
+  if(currentAlbumIndex >= albumKeys.length) return;
+  currentAlbumKey = albumKeys[currentAlbumIndex];
+  const card = document.querySelector(`.album-card[data-album="${currentAlbumKey}"]`);
+  card.click();
+});
+
+// ปิด modal
+closeModal.addEventListener('click',()=>{albumModal.style.display='none';});
+albumModal.addEventListener('click', e=>{if(e.target===albumModal) albumModal.style.display='none';});
+
+const backIndexBtn = document.getElementById('back-index-btn');
+backIndexBtn.addEventListener('click', ()=>{
+  window.location.href = 'index.html'; // หรือใช้ window.location.reload() ถ้าอยู่หน้าเดียวกัน
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 ของขวัญครบรอบ 1 ปี</title>
+<style>
+  body {
+    margin:0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg,#ffe6f0,#fff0f5);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    text-align:center;
+    overflow:hidden;
+  }
+  h1 {
+    color:#ff1493;
+    font-size:2.5rem;
+    margin-bottom:20px;
+    text-shadow: 1px 1px 5px #ff69b4;
+  }
+  #countdown {
+    font-size:1.5rem;
+    color:#ff69b4;
+    margin-bottom:30px;
+    font-weight:bold;
+  }
+  #gift-btn {
+    padding:15px 25px;
+    font-size:1.2rem;
+    border:none;
+    border-radius:15px;
+    background:linear-gradient(90deg,#ff69b4,#ff1493);
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 5px 15px rgba(255,20,147,0.3);
+    transition:0.3s;
+  }
+  #gift-btn:hover {
+    transform: scale(1.1);
+    box-shadow:0 8px 20px rgba(255,20,147,0.5);
+  }
+
+  /* Popup ของขวัญ */
+  #gift-popup {
+    display:none;
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(5px);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+  }
+  #gift-content {
+    background:#fff;
+    padding:30px 25px;
+    border-radius:20px;
+    max-width:350px;
+    text-align:center;
+    font-weight:bold;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    animation:popupBounce 0.5s ease;
+  }
+  #gift-content img {
+    max-width:100%;
+    border-radius:15px;
+    margin-bottom:15px;
+  }
+  #close-gift {
+    padding:8px 16px;
+    border:none;
+    border-radius:12px;
+    background:#ff69b4;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:10px;
+  }
+
+  @keyframes popupBounce {
+    0% {transform: scale(0.5); opacity:0;}
+    60% {transform: scale(1.1); opacity:1;}
+    100% {transform: scale(1); opacity:1;}
+  }
+</style>
+</head>
+<body>
+
+<h1>🎁 ของขวัญครบรอบ 1 ปี</h1>
+<div id="countdown">นับถอยหลังไปยังวันครบรอบ...</div>
+<button id="gift-btn" disabled>เปิดของขวัญ</button>
+
+<!-- Popup ของขวัญ -->
+<div id="gift-popup">
+  <div id="gift-content">
+    <img src="images/gift.png" alt="ของขวัญ">
+    <p>💖 สุขสันต์วันครบรอบ 1 ปี! 💖</p>
+    <button id="close-gift">ปิด 💌</button>
+  </div>
+</div>
+
+<script>
+const giftBtn = document.getElementById("gift-btn");
+const giftPopup = document.getElementById("gift-popup");
+const closeGift = document.getElementById("close-gift");
+const countdownEl = document.getElementById("countdown");
+
+// วันที่เป้าหมาย
+const targetDate = new Date(2025, 10, 16, 0, 0, 0); // เดือนเริ่มที่ 0 → 10 = พฤศจิกายน
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = targetDate - now;
+
+  if(diff > 0){
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const seconds = Math.floor((diff % (1000*60)) / 1000);
+    countdownEl.textContent = `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วิ`;
+    giftBtn.disabled = true;
+  } else {
+    countdownEl.textContent = "🎉 วันนี้เป็นวันครบรอบแล้ว! 🎉";
+    giftBtn.disabled = false;
+  }
+}
+
+// เปิดของขวัญ
+giftBtn.addEventListener("click", () => {
+  giftPopup.style.display = "flex";
+});
+
+// ปิด popup
+closeGift.addEventListener("click", () => {
+  giftPopup.style.display = "none";
+});
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+
+</body>
+</html>

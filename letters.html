@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Letters 💌</title>
+  <link rel="stylesheet" href="letters.css">
+</head>
+<body class="pink-mode">
+  <h1>📬 กล่องจดหมาย 
+    <span id="badge" class="badge">0</span>
+  </h1>
+
+  <div class="mode-toggle">
+    <button id="toggle-mode">🌙 Dark / Pink Mode</button>
+  </div>
+
+  <input type="text" id="search" placeholder="🔍 ค้นหาจดหมาย...">
+
+  <div id="letters-list" class="memory-grid"></div>
+
+  <div class="btn-group">
+    <a href="send-letter.html" class="write-btn">✍ เขียนจดหมาย</a>
+    <a href="index.html" class="back-btn">🏠 กลับหน้าหลัก</a>
+  </div>
+
+  <!-- Cute Delete Confirmation Popup -->
+  <div id="delete-popup">
+    <div class="popup-content">
+      <p>จะลบจริงๆ หรอ แงงง 💔</p>
+      <button id="confirm-delete">ลบ ❌</button>
+      <button id="cancel-delete">ยกเลิก 💖</button>
+    </div>
+  </div>
+
+<div id="read-popup">
+  <div class="popup-content">
+    <h3 id="read-title"></h3>
+    <p id="read-sender"></p>
+    <p id="read-message"></p>
+    <button id="close-read">ปิด ✨</button>
+  </div>
+
+  <script src="letters.js"></script>
+
+  <!-- Cute Read Animation -->
+
+</div>
+</body>
+</html>
