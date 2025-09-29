@@ -1,3 +1,4 @@
+
 const listDiv = document.getElementById("letters-list");
 const badge = document.getElementById("badge");
 const searchInput = document.getElementById("search");
@@ -25,7 +26,7 @@ const cancelDelete = document.getElementById("cancel-delete");
 // Render Letters
 function renderLetters(filtered = letters) {
   listDiv.innerHTML = "";
-  if(filtered.length === 0){
+  if (filtered.length === 0) {
     listDiv.innerHTML = "<p>ยังไม่มีจดหมาย 💌</p>";
     return;
   }
@@ -33,7 +34,7 @@ function renderLetters(filtered = letters) {
     const card = document.createElement("div");
     card.className = "letter-card";
     card.innerHTML = `
-      <h3>${letter.title} ${letter.read ? "[อ่านแล้ว]" : ""}</h3>
+      <h3>${letter.title} ${letter.read ? "✔" : ""}</h3>
       <p><b>จาก:</b> ${letter.sender}</p>
       <p>${letter.message.substring(0, 50)}...</p>
       <small>${letter.date}</small><br>
@@ -44,53 +45,14 @@ function renderLetters(filtered = letters) {
   });
 }
 
-// อ่านจดหมาย
-function readLetter(i){
-  const card = document.getElementsByClassName("letter-card")[i];
-  const l = letters[i];
-
-  // สร้างด้านหน้า/หลัง
-  if(!card.querySelector(".back")){
-    const frontHTML = card.innerHTML;
-    const backDiv = document.createElement("div");
-    backDiv.className = "back";
-    backDiv.innerHTML = `
-      <h3>${l.title}</h3>
-      <p><b>จาก:</b> ${l.sender}</p>
-      <p>${l.message}</p>
-      <small>${l.date}</small><br>
-      <button onclick="closeLetter(${i})">กลับ 🔙</button>
-    `;
-    card.innerHTML = `<div class="front">${frontHTML}</div>`;
-    card.appendChild(backDiv);
-  }
-
-  card.classList.add("flipped");
-
-  // ติ๊กอ่านแล้ว
-  if(!l.read){
-    l.read = true;
-    localStorage.setItem("letters", JSON.stringify(letters));
-    unreadCount--;
-    badge.innerText = unreadCount;
-    renderLetters();
-  }
-}
-
-function closeLetter(i){
-  const card = document.getElementsByClassName("letter-card")[i];
-  card.classList.remove("flipped");
-}
-
-
 // ลบจดหมาย
-function showDeletePopup(i){
+function showDeletePopup(i) {
   deleteIndex = i;
   deletePopup.style.display = "flex";
 }
-confirmDelete.addEventListener("click", ()=>{
-  if(deleteIndex !== null){
-    letters.splice(deleteIndex,1);
+confirmDelete.addEventListener("click", () => {
+  if (deleteIndex !== null) {
+    letters.splice(deleteIndex, 1);
     localStorage.setItem("letters", JSON.stringify(letters));
     unreadCount = letters.filter(l => !l.read).length;
     badge.innerText = unreadCount;
@@ -99,22 +61,23 @@ confirmDelete.addEventListener("click", ()=>{
     deletePopup.style.display = "none";
   }
 });
-cancelDelete.addEventListener("click", ()=>{
+cancelDelete.addEventListener("click", () => {
   deleteIndex = null;
   deletePopup.style.display = "none";
 });
 
 // Search letters
-searchInput.addEventListener("input", ()=>{
+searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
-  const filtered = letters.filter(l => 
-    l.title.toLowerCase().includes(query) || l.sender.toLowerCase().includes(query)
+  const filtered = letters.filter(
+    l =>
+      l.title.toLowerCase().includes(query) ||
+      l.sender.toLowerCase().includes(query)
   );
   renderLetters(filtered);
 });
 
-// เรียกตอนโหลด
-renderLetters();
+// ---------------- Popup อ่าน ----------------
 const readPopup = document.getElementById("read-popup");
 const readTitle = document.getElementById("read-title");
 const readSender = document.getElementById("read-sender");
@@ -136,7 +99,6 @@ function readLetter(i) {
     l.read = true;
     localStorage.setItem("letters", JSON.stringify(letters));
     unreadCount--;
-    localStorage.setItem("letterCount", unreadCount);
     badge.innerText = unreadCount;
     renderLetters();
   }
@@ -147,3 +109,5 @@ closeRead.addEventListener("click", () => {
   readPopup.style.display = "none";
 });
 
+// เรียกตอนโหลด
+renderLetters();

@@ -1,347 +1,459 @@
 <!DOCTYPE html>
+
 <html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Memory Albums 💖</title>
-<button id="back-index-btn">&#8592; หน้าแรก</button>
+<title>Gallery Albums 💖</title>
+
 <style>
-body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg,#ffe6f0,#fff);
-  text-align: center;
-}
-h1 {
-  color: #ff1493;
-  margin-top: 20px;
-  margin-bottom: 40px;
-  text-shadow: 0 0 10px #ff69b4;
-}
-.album-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 25px;
-  padding: 0 20px 50px 20px;
-}
-.album-card {
-  width: 220px;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 5px 20px rgba(255,20,147,0.2);
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.album-card:hover {
-  transform: translateY(-10px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(255,20,147,0.3);
-}
-.album-card img {
-  width: 100%;
-  display: block;
-  height: 140px;
-  object-fit: cover;
-}
-.album-content {
-  padding: 12px;
-}
-.album-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #ff1493;
-  margin-bottom: 5px;
-}
-.album-desc {
-  font-size: 0.95rem;
-  color: #ff69b4;
-}
-.view-all-btn {
-  margin-top: 8px;
-  padding: 6px 12px;
-  background: #ff69b4;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s;
-}
-.view-all-btn:hover {
-  background: #ff1493;
+  body { font-family: 'Arial', sans-serif; background: #fff0f5; margin:0; padding:20px; text-align:center; }
+  h1 { color:#ff69b4; margin-bottom:10px; text-shadow:0 0 10px #ffb6c1; }
+
+  input, button { margin:5px; padding:8px 12px; border-radius:8px; border:none; font-size:14px; }
+  button { cursor:pointer; background: linear-gradient(45deg, #ff9cd3, #ff69b4); color:white; font-weight:bold; transition: transform 0.2s; }
+  button:hover { transform: scale(1.05); }
+
+  #album-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px; margin-top:20px; }
+  .album-card { position:relative; border-radius:15px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.15); cursor:pointer; background:#fff; transition: transform 0.2s, box-shadow 0.3s; }
+  .album-card:hover { transform: scale(1.03); box-shadow:0 8px 20px rgba(255,20,147,0.2); }
+  .album-card img { width:100%; height:140px; object-fit:cover; }
+  .album-content { padding:12px; }
+  .album-title { font-size:1.1rem; font-weight:bold; color:#ff1493; }
+  .album-desc { font-size:0.9rem; color:#777; margin-top:4px; }
+  .album-owner { font-size:0.8rem; color:#aaa; margin-top:6px; }
+  .album-actions { margin-top:10px; display:flex; justify-content:center; gap:10px; }
+  .album-actions button { font-size:0.8rem; padding:5px 10px; }
+
+  /* Photo Grid */
+  #photo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:15px; margin-top:20px; }
+  .photo-card { position:relative; border-radius:10px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.15); }
+  .photo-card img { width:100%; height:120px; object-fit:cover; cursor:pointer; }
+  .photo-btns { position:absolute; top:8px; right:8px; display:flex; gap:5px; }
+  .photo-btns button { width:28px; height:28px; border-radius:50%; border:none; color:#fff; font-weight:bold; cursor:pointer; font-size:14px; }
+  .delete-btn { background:red; }
+  .edit-btn { background:orange; }
+
+  /* Modal */
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999; }
+  .modal-content { background:#fff; border-radius:15px; padding:20px; width:90%; max-width:400px; text-align:center; box-shadow:0 5px 15px rgba(255,20,147,0.3); }
+  .modal-content h2 { color:#ff1493; margin-bottom:15px; }
+  .modal-content input { width:90%; margin:8px auto; display:block; }
+  .modal-content button { margin-top:10px; }
+
+  #lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center; flex-direction:column; z-index:9999; }
+  #lightbox img { max-width:90%; max-height:80%; border-radius:12px; margin-bottom:10px; }
+  /* ---------------- Photo Added Animation ---------------- */
+.photo-added {
+  animation: pop 0.5s ease forwards;
 }
 
-/* Modal */
-#album-modal {
-  display: none;
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.85);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-#modal-container {
-  position: relative;
-  max-width: 90%;
-  max-height: 80%;
-  text-align: center;
-}
-#modal-img {
-  max-width: 100%;
-  max-height: 70vh;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(255,20,147,0.3);
-  transition: opacity 0.5s ease-in-out;
-  opacity: 1;
-}
-#album-name {
-  color: #fff;
-  font-size: 1.5rem;
-  margin: 10px 0;
-  text-shadow: 0 0 10px #ff69b4;
-}
-#image-counter {
-  color: #fff;
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-.close-btn {
-  position: fixed;
-  top: 15px;
-  right: 25px;
-  font-size: 2rem;
-  color: #fff;
-  cursor: pointer;
-  z-index: 10000;
-}
-.nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255,20,147,0.6);
-  color: #fff;
-  border: none;
-  font-size: 2rem;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 50%;
-  user-select: none;
-}
-#prev-btn { left: -60px; }
-#next-btn { right: -60px; }
-
-#modal-grid {
-  display: none;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-}
-#modal-grid img {
-  width: 200px;
-  height: 200px; /* ให้เป็นสี่เหลี่ยมจัตุรัส */
-  object-fit: cover; /* ครอบเต็มแต่ไม่บิด */
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(255,20,147,0.3);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-#modal-grid img.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-.next-album-btn {
-  margin-top: 15px;
-  padding: 8px 14px;
-  background: #ff69b4;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.next-album-btn:hover { background: #ff1493; }
-
-#back-index-btn {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 10001;
-  padding: 8px 12px;
-  background: rgba(255,20,147,0.8);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-#back-index-btn:hover {
-  background: rgba(255,20,147,1);
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 </style>
+
 </head>
 <body>
+<h1>Gallery Albums 💖</h1>
 
-<h1>รวมคลังภาพของเรา ❤</h1>
+<!-- Auth -->
 
-<div class="album-grid" id="album-grid">
-  <!-- ตัวอย่างอัลบั้ม -->
-  <div class="album-card" data-album="album1" data-name="เจอกันครั้งแรก">
-    <img src="images/album1/1.png" alt="Album 1">
-    <div class="album-content">
-      <div class="album-title">เจอกันครั้งแรก</div>
-      <div class="album-desc">ไม่ได้เที่ยว แต่อยู่โรงแรมฉ่ำ</div>
-      <button class="view-all-btn">ดูทั้งหมด</button>
-    </div>
+<div id="auth-section">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button id="registerBtn">สมัคร 💖</button>
+  <button id="loginBtn">ล็อกอิน ✨</button>
+  <button id="logoutBtn" style="display:none;">กลับหน้าหลัก</button>
+</div>
+
+<!-- Create Album -->
+<div id="create-album-section" style="display:none;">
+  <input type="text" id="albumTitle" placeholder="ชื่ออัลบั้ม 🌸">
+  <input type="text" id="albumDesc" placeholder="คำบรรยายอัลบั้ม 🌸">
+  <input type="file" id="coverFile" accept="image/*">
+  <img id="coverPreview" style="display:none; max-height:100px; margin-top:10px; border-radius:8px;">
+  <button id="createAlbumBtn">สร้างอัลบั้มใหม่ 🎀</button>
+</div>
+
+<!-- Album View -->
+<div id="album-view" style="display:none;">
+  <button id="backBtn">◀ กลับ</button>
+  <h2 id="albumName"></h2>
+  <input type="file" id="photoFile" accept="image/*">
+  <img id="photoPreview" style="display:none; max-height:100px; margin-top:10px; border-radius:8px;">
+  <button id="addPhotoBtn">เพิ่มรูปลงอัลบั้ม 💖</button>
+  <div id="photo-grid"></div>
+</div>
+
+<!-- Album Cards -->
+
+<div id="album-container"></div>
+
+<!-- Album View -->
+
+<div id="album-view" style="display:none;">
+  <button id="backBtn">◀ กลับ</button>
+  <h2 id="albumName"></h2>
+  <div>
+    <input type="file" id="photoFile" accept="image/*">
+    <button id="addPhotoBtn">เพิ่มรูปลงอัลบั้ม 💖</button>
   </div>
+  <div id="photo-grid"></div>
+</div>
 
-  <div class="album-card" data-album="album2" data-name="วันสำคัญ 💖">
-    <img src="images/album2/cover1.jpg" alt="Album 2">
-    <div class="album-content">
-      <div class="album-title">วันสำคัญ 💖</div>
-      <div class="album-desc">วันพิเศษของเราที่เก็บไว้</div>
-      <button class="view-all-btn">ดูทั้งหมด</button>
-    </div>
-  </div>
+<!-- Lightbox -->
 
-  <div class="album-card" data-album="album3" data-name="ช่วงเวลาสนุก 🎉">
-    <img src="images/album3/cover1.jpg" alt="Album 3">
-    <div class="album-content">
-      <div class="album-title">ช่วงเวลาสนุก 🎉</div>
-      <div class="album-desc">รูปเล่น ๆ สนุก ๆ</div>
-      <button class="view-all-btn">ดูทั้งหมด</button>
-    </div>
+<div id="lightbox">
+  <img id="lightboxImg" src="">
+  <button id="closeBtn">Close ✖</button>
+</div>
+
+<!-- Edit Modal -->
+
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h2 id="modalTitle">แก้ไข</h2>
+    <input type="text" id="editInput1" placeholder="">
+    <input type="text" id="editInput2" placeholder="" style="display:none;">
+    <input type="file" id="editFile" accept="image/*" style="display:none;">
+    <button id="saveEditBtn">บันทึก ✅</button>
+    <button onclick="closeModal()">ยกเลิก ❌</button>
   </div>
 </div>
 
-<!-- Modal -->
-<div id="album-modal">
-  <span class="close-btn" id="close-modal">&times;</span>
-  <div id="modal-container">
-    <button class="nav-btn" id="prev-btn">&#10094;</button>
-    <div id="album-name"></div>
-    <div id="image-counter"></div>
-    <img id="modal-img" src="">
-    <div id="modal-grid"></div>
-    <button class="nav-btn" id="next-btn">&#10095;</button>
-    <button class="next-album-btn" id="next-album-btn" style="display:none;">ไปอัลบั้มถัดไป</button>
-  </div>
-</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-<script>
-const albums = {
-  album1: ["images/album1/2.jpg","images/album1/3.jpg","images/album1/4.jpg","images/album1/5.jpg"],
-  album2: ["images/album2/1.jpg","images/album2/2.jpg","images/album2/3.jpg"],
-  album3: ["images/album3/1.jpg","images/album3/2.jpg","images/album3/3.jpg"]
+const firebaseConfig = {
+  apiKey: "AIzaSyBZ6LqVNG-8EFFmyXBxBctJ9OGkayfNA4A",
+  authDomain: "anmemorise.firebaseapp.com",
+  projectId: "anmemorise",
+  storageBucket: "anmemorise.firebasestorage.app",
+  messagingSenderId: "991699333084",
+  appId: "1:991699333084:web:17595fd2079119fd9b2919",
 };
-const albumCards = document.querySelectorAll('.album-card');
-const albumModal = document.getElementById('album-modal');
-const modalImg = document.getElementById('modal-img');
-const albumName = document.getElementById('album-name');
-const imageCounter = document.getElementById('image-counter');
-const closeModal = document.getElementById('close-modal');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const modalGrid = document.getElementById('modal-grid');
-const viewAllBtns = document.querySelectorAll('.view-all-btn');
-const nextAlbumBtn = document.getElementById('next-album-btn');
 
-let albumKeys = Object.keys(albums);
-let currentAlbumKey = '';
-let currentAlbumIndex = 0;
-let currentIndex = 0;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-function fadeIn(){
-  modalImg.style.opacity = 0;
-  setTimeout(()=> modalImg.style.opacity = 1, 50);
+// Elements
+const emailInput=document.getElementById('email');
+const passwordInput=document.getElementById('password');
+const registerBtn=document.getElementById('registerBtn');
+const loginBtn=document.getElementById('loginBtn');
+const logoutBtn=document.getElementById('logoutBtn');
+const createAlbumSection=document.getElementById('create-album-section');
+const albumTitleInput=document.getElementById('albumTitle');
+const albumDescInput=document.getElementById('albumDesc');
+const coverFileInput=document.getElementById('coverFile');
+const createAlbumBtn=document.getElementById('createAlbumBtn');
+const albumContainer=document.getElementById('album-container');
+const albumView=document.getElementById('album-view');
+const backBtn=document.getElementById('backBtn');
+const albumNameH2=document.getElementById('albumName');
+const photoFile=document.getElementById('photoFile');
+const addPhotoBtn=document.getElementById('addPhotoBtn');
+const photoGrid=document.getElementById('photo-grid');
+
+const lightbox=document.getElementById('lightbox');
+const lightboxImg=document.getElementById('lightboxImg');
+const closeBtn=document.getElementById('closeBtn');
+
+const editModal=document.getElementById('editModal');
+const modalTitle=document.getElementById('modalTitle');
+const editInput1=document.getElementById('editInput1');
+const editInput2=document.getElementById('editInput2');
+const editFile=document.getElementById('editFile');
+const saveEditBtn=document.getElementById('saveEditBtn');
+
+let currentAlbum=null;
+let currentPhoto=null;
+let editTarget=null;
+let albumData=[];
+
+
+// ---------------- Auth ----------------
+function isValidEmail(email) {
+  return /\S+@\S+\.\S+/.test(email);
 }
-function updateCounter(){
-  imageCounter.textContent = `รูป ${currentIndex+1} / ${currentAlbum.length}`;
-}
-function showImage(index){
-  modalImg.style.opacity = 0;
+
+registerBtn.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  
+  if (!email || !password) return showNotif("กรอก Email และ Password ด้วยนะ 🌸");
+  if (!isValidEmail(email)) return showNotif("รูปแบบ Email ไม่ถูกต้อง ❌");
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => showNotif("สมัครสำเร็จ 💖"))
+    .catch(e => showNotif(e.message));
+});
+
+loginBtn.addEventListener('click', () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  if (!email || !password) return showNotif("กรอก Email และ Password ด้วยนะ 🌸");
+  if (!isValidEmail(email)) return showNotif("รูปแบบ Email ไม่ถูกต้อง ❌");
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => showNotif("ล็อกอินสำเร็จ ✨"))
+    .catch(e => showNotif(e.message));
+});
+
+logoutBtn.addEventListener('click', () => {
+  signOut(auth).then(() => {
+    window.location.href = "index.html"; // กลับไปหน้าแรก
+  });
+});
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    createAlbumSection.style.display='block';
+    logoutBtn.style.display='inline-block';
+    loginBtn.style.display='none';
+    registerBtn.style.display='none';
+    emailInput.style.display='none';
+    passwordInput.style.display='none';
+  } else {
+    createAlbumSection.style.display='none';
+    logoutBtn.style.display='none';
+    loginBtn.style.display='inline-block';
+    registerBtn.style.display='inline-block';
+    emailInput.style.display='inline-block';
+    passwordInput.style.display='inline-block';
+  }
+});
+
+
+// ---------------- Preview Upload ----------------
+const coverPreview=document.getElementById('coverPreview');
+const photoPreview=document.getElementById('photoPreview');
+
+coverFileInput.addEventListener("change",()=>{
+  const file=coverFileInput.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>{ coverPreview.src=reader.result; coverPreview.style.display="block"; };
+    reader.readAsDataURL(file);
+  }else{ coverPreview.style.display="none"; }
+});
+
+photoFile.addEventListener("change",()=>{
+  const file=photoFile.files[0];
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>{ photoPreview.src=reader.result; photoPreview.style.display="block"; };
+    reader.readAsDataURL(file);
+  }else{ photoPreview.style.display="none"; }
+});
+
+
+// ---------------- Notification ----------------
+const notif = document.getElementById('notif');
+
+function showNotif(message){
+  notif.innerText = message;
+  notif.style.display = 'block';
+  notif.style.transform = 'scale(1)';
+  notif.style.opacity = '1';
+  
   setTimeout(()=>{
-    modalImg.src = currentAlbum[index];
-    fadeIn();
-    updateCounter();
-  }, 200);
+    notif.style.transform = 'scale(0)';
+    notif.style.opacity = '0';
+    setTimeout(()=> notif.style.display='none', 300);
+  }, 2000); // เด้งอยู่ 2 วินาที
 }
 
-albumCards.forEach(card=>{
-  card.addEventListener('click',()=>{
-    currentAlbumKey = card.dataset.album;
-    currentAlbumIndex = albumKeys.indexOf(currentAlbumKey);
-    currentAlbum = albums[currentAlbumKey];
-    currentIndex = 0;
-    modalImg.style.display='block';
-    prevBtn.style.display='block';
-    nextBtn.style.display='block';
-    modalGrid.style.display='none';
-    nextAlbumBtn.style.display = (currentAlbumIndex < albumKeys.length-1)? 'block':'none';
-    modalImg.src = currentAlbum[currentIndex];
-    albumName.textContent = card.dataset.name;
-    albumModal.style.display='flex';
-    fadeIn();
-    updateCounter();
+
+
+// ---------------- Create Album ----------------
+createAlbumBtn.addEventListener('click', async () => {
+  const title = albumTitleInput.value;
+  const desc = albumDescInput.value;
+  const file = coverFileInput.files[0];
+  if (!title || !file) return alert("กรอกชื่ออัลบั้มและเลือกภาพปก 🌸");
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      await addDoc(collection(db, 'albums'), {
+        title, description: desc, cover: reader.result, owner: auth.currentUser.uid, createdAt: new Date()
+      });
+      albumTitleInput.value = ''; albumDescInput.value = ''; coverFileInput.value = '';
+      showNotif("สร้างอัลบั้มสำเร็จ 🎀");
+    } catch (e) { alert("เกิดข้อผิดพลาด " + e.message); }
+  };
+  reader.readAsDataURL(file);
+});
+
+// ---------------- Load Albums ----------------
+onSnapshot(collection(db,'albums'), snapshot=>{
+  albumContainer.innerHTML=''; albumData=[];
+  snapshot.forEach(docSnap=>{
+    const data=docSnap.data(); data.id=docSnap.id; albumData.push(data);
+    const card=document.createElement('div'); card.className='album-card';
+    card.innerHTML=`
+      <img src="${data.cover}">
+      <div class="album-content">
+        <div class="album-title">${data.title}</div>
+        <div class="album-desc">${data.description||''}</div>
+        
+        <div class="album-actions">
+          <button onclick="openAlbum('${data.id}')">เปิด</button>
+          <button onclick="openEditModal('album','${data.id}')">แก้ไข</button>
+        </div>
+      </div>`;
+    albumContainer.appendChild(card);
   });
 });
 
-prevBtn.addEventListener('click', e=>{
-  e.stopPropagation();
-  currentIndex = (currentIndex - 1 + currentAlbum.length) % currentAlbum.length;
-  showImage(currentIndex);
-});
-nextBtn.addEventListener('click', e=>{
-  e.stopPropagation();
-  currentIndex = (currentIndex + 1) % currentAlbum.length;
-  showImage(currentIndex);
-});
+// ---------------- Open Album ----------------
+window.openAlbum = function(id){
+  currentAlbum = albumData.find(a=>a.id===id);
+  albumContainer.style.display='none'; albumView.style.display='block'; albumNameH2.innerText=currentAlbum.title;
+  loadPhotos();
+};
 
-viewAllBtns.forEach(btn=>{
-  btn.addEventListener('click', e=>{
-    e.stopPropagation();
-    const card = btn.closest('.album-card');
-    const key = card.dataset.album;
-    const title = card.dataset.name;
-    const images = albums[key];
-    modalImg.style.display='none';
-    prevBtn.style.display='none';
-    nextBtn.style.display='none';
-    nextAlbumBtn.style.display = (albumKeys.indexOf(key) < albumKeys.length-1)? 'block':'none';
-    albumName.textContent = title;
-    modalGrid.innerHTML='';
-    modalGrid.style.display='flex';
-    images.forEach((src, idx)=>{
-      const img = document.createElement('img');
-      img.src=src;
-      modalGrid.appendChild(img);
-      setTimeout(()=>img.classList.add('show'), idx*150);
+// ---------------- Load Photos ----------------
+function loadPhotos(){
+  const photosCol=collection(db,'albums',currentAlbum.id,'photos');
+  onSnapshot(photosCol,snapshot=>{
+    photoGrid.innerHTML='';
+    snapshot.forEach(docSnap=>{
+      const data=docSnap.data(); data.id=docSnap.id;
+      const card=document.createElement('div'); card.className='photo-card';
+      const img=document.createElement('img'); img.src=data.imageData;
+      img.onclick=()=>{ lightboxImg.src=data.imageData; lightbox.style.display='flex'; };
+      card.appendChild(img);
+
+      const btns=document.createElement('div'); btns.className='photo-btns';
+      const delBtn=document.createElement('button'); delBtn.className='delete-btn'; delBtn.innerText='×';
+      delBtn.onclick=async()=> await deleteDoc(doc(db,'albums',currentAlbum.id,'photos',data.id));
+      const editBtn=document.createElement('button'); editBtn.className='edit-btn'; editBtn.innerText='✎';
+      editBtn.onclick=()=>{ currentPhoto=data; openEditModal('photo',data.id); };
+      btns.appendChild(editBtn); btns.appendChild(delBtn);
+      card.appendChild(btns);
+      photoGrid.appendChild(card);
     });
-    albumModal.style.display='flex';
-    imageCounter.textContent = `ทั้งหมด ${images.length} รูป`;
   });
+}
+
+
+// ---------------- Add Photo ----------------
+// ---------------- Add Photo ----------------
+addPhotoBtn.addEventListener('click', () => {
+  const file = photoFile.files[0];
+  if (!file) return showNotif("เลือกไฟล์ก่อน 🌸");
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      // แสดง Notification ว่า กำลังอัปโหลด
+      showNotif("กำลังอัปโหลดรูป... ✨");
+
+      // อัปโหลดรูปไป Firestore
+      await addDoc(collection(db, 'albums', currentAlbum.id, 'photos'), {
+        imageData: reader.result,
+        owner: auth.currentUser.uid,
+        name: file.name,
+        createdAt: new Date()
+      });
+
+      // รีเซ็ต input และ preview
+      photoFile.value = '';
+      photoPreview.src = '';
+      photoPreview.style.display = 'none';
+
+      // เด้ง Notification หลังอัปโหลดเสร็จ
+      showNotif("เพิ่มรูปสำเร็จ 💖");
+
+      // Animation รูปเด้งตรงกลางหน้าจอ
+      const tempImg = document.createElement('img');
+      tempImg.src = reader.result;
+      tempImg.className = 'photo-added';
+      tempImg.style.position = 'fixed';
+      tempImg.style.top = '50%';
+      tempImg.style.left = '50%';
+      tempImg.style.width = '100px';
+      tempImg.style.height = '100px';
+      tempImg.style.borderRadius = '12px';
+      tempImg.style.zIndex = '10001';
+      tempImg.style.transform = 'translate(-50%, -50%)';
+      document.body.appendChild(tempImg);
+
+      setTimeout(() => tempImg.remove(), 500);
+
+    } catch (e) {
+      showNotif("เกิดข้อผิดพลาด ❌ " + e.message);
+    }
+  };
+  reader.readAsDataURL(file);
 });
 
-nextAlbumBtn.addEventListener('click', ()=>{
-  currentAlbumIndex++;
-  if(currentAlbumIndex >= albumKeys.length) return;
-  currentAlbumKey = albumKeys[currentAlbumIndex];
-  const card = document.querySelector(`.album-card[data-album="${currentAlbumKey}"]`);
-  card.click();
+// ---------------- Modal Edit ----------------
+window.openEditModal=function(type,id){
+  editModal.style.display='flex';
+  if(type==='album'){
+    const album = albumData.find(a=>a.id===id); // ดึงข้อมูลจาก albumData โดยตรง
+    modalTitle.innerText='แก้ไขอัลบั้ม 🎀';
+    editInput1.style.display='block'; editInput1.value=album.title; editInput1.placeholder='ชื่ออัลบั้ม';
+    editInput2.style.display='block'; editInput2.value=album.description||''; editInput2.placeholder='คำบรรยาย';
+    editFile.style.display='block';
+    editTarget={type,id};
+  } else if(type==='photo'){
+    modalTitle.innerText='แก้ไขรูป ✨';
+    editInput1.style.display='block'; editInput1.value=currentPhoto.name; editInput1.placeholder='ชื่อรูป';
+    editInput2.style.display='none'; editFile.style.display='none';
+    editTarget={type,id};
+  }
+};
+
+saveEditBtn.onclick=async()=>{
+  if(!editTarget) return;
+  if(editTarget.type==='album'){
+    let updates={title:editInput1.value, description:editInput2.value};
+    if(editFile.files[0]){
+      const reader=new FileReader();
+      reader.onload=async()=>{ updates.cover=reader.result; await updateDoc(doc(db,'albums',editTarget.id),updates); closeModal(); };
+      reader.readAsDataURL(editFile.files[0]);
+    }else{
+      await updateDoc(doc(db,'albums',editTarget.id),updates); closeModal();
+    }
+  }else if(editTarget.type==='photo'){
+    await updateDoc(doc(db,'albums',currentAlbum.id,'photos',editTarget.id),{name:editInput1.value});
+    closeModal();
+  }
+};
+
+window.closeModal=function(){ editModal.style.display='none'; editTarget=null; };
+
+// ---------------- Back ----------------
+backbtn.addEventListener('click', () => {
+  // ไม่ต้อง signOut()
+  window.location.href = "index.html"; // แค่ไปหน้าแรก
 });
 
-// ปิด modal
-closeModal.addEventListener('click',()=>{albumModal.style.display='none';});
-albumModal.addEventListener('click', e=>{if(e.target===albumModal) albumModal.style.display='none';});
-
-const backIndexBtn = document.getElementById('back-index-btn');
-backIndexBtn.addEventListener('click', ()=>{
-  window.location.href = 'index.html'; // หรือใช้ window.location.reload() ถ้าอยู่หน้าเดียวกัน
-});
+// ---------------- Lightbox ----------------
+closeBtn.onclick=()=>lightbox.style.display='none';
 </script>
+
+<!-- Notification Popup -->
+<div id="notif" style="
+  position: fixed; top: 20px; right: 20px; 
+  background: linear-gradient(45deg, #ff9cd3, #ff69b4);
+  color: white; padding: 10px 20px; border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(255,20,147,0.3);
+  font-weight: bold; display: none; transform: scale(0);
+  z-index: 10000; transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+">แจ้งเตือน</div>
 
 </body>
 </html>

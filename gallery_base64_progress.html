@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery 💖 (Base64 + Progress)</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+    #gallery div { position: relative; display: inline-block; }
+    #gallery img { width: 150px; border-radius: 8px; }
+    .delete-btn { position: absolute; top: 2px; right: 2px; background:red; color:white; border:none; border-radius:50%; cursor:pointer; }
+    input, button { margin: 5px; }
+    #progressWrapper { display: none; width: 80%; margin: 10px auto; background: #eee; border-radius: 10px; }
+    #progressBar { width: 0%; height: 20px; background: #ff69b4; border-radius: 10px; transition: width 0.2s; }
+  </style>
+</head>
+<body>
+  <h1>Gallery 💖 (Base64 + Progress)</h1>
+
+  <div id="auth-section">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="registerBtn">Register</button>
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+  </div>
+
+  <div id="upload-section" style="display:none;">
+    <input type="file" id="fileInput" accept="image/*">
+    <button id="uploadBtn">อัปโหลด</button>
+    <div id="progressWrapper"><div id="progressBar"></div></div>
+  </div>
+
+  <h2>รูปทั้งหมด</h2>
+  <div id="gallery"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const uploadSection = document.getElementById('upload-section');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const gallery = document.getElementById('gallery');
+    const progressWrapper = document.getElementById('progressWrapper');
+    const progressBar = document.getElementById('progressBar');
+
+    // ---------------- Auth ----------------
+    registerBtn.addEventListener('click', () => {
+      createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+        .then(() => alert("สมัครสำเร็จ!"))
+        .catch(err => alert(err.message));
+    });
+
+    loginBtn.addEventListener('click', () => {
+      signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
+        .then(() => alert("ล็อกอินสำเร็จ!"))
+        .catch(err => alert(err.message));
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth).then(() => alert("ออกจากระบบเรียบร้อย"));
+    });
+
+    onAuthStateChanged(auth, user => {
+      if(user){
+        uploadSection.style.display = 'block';
+        logoutBtn.style.display = 'inline-block';
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        emailInput.style.display = 'none';
+        passwordInput.style.display = 'none';
+      } else {
+        uploadSection.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        loginBtn.style.display = 'inline-block';
+        registerBtn.style.display = 'inline-block';
+        emailInput.style.display = 'inline-block';
+        passwordInput.style.display = 'inline-block';
+      }
+    });
+
+    // ---------------- Upload Base64 with Progress ----------------
+    uploadBtn.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if(!user) return alert("คุณต้องล็อกอินก่อน");
+
+      const file = fileInput.files[0];
+      if(!file) return alert("กรุณาเลือกไฟล์");
+
+      progressWrapper.style.display = 'block';
+      progressBar.style.width = '0%';
+
+      const reader = new FileReader();
+      reader.onprogress = (event) => {
+        if(event.lengthComputable){
+          const percent = (event.loaded / event.total) * 100;
+          progressBar.style.width = percent + '%';
+        }
+      };
+
+      reader.onload = async () => {
+        const base64 = reader.result; // แปลงเป็น Base64
+        try {
+          await addDoc(collection(db, 'users'), {
+            imageData: base64,
+            owner: user.uid,
+            name: file.name,
+            createdAt: new Date()
+          });
+          fileInput.value = '';
+          progressBar.style.width = '100%';
+          setTimeout(()=> progressWrapper.style.display = 'none', 500);
+          alert("อัปโหลดสำเร็จ 💖");
+        } catch(err) {
+          console.error(err);
+          alert("เกิดข้อผิดพลาด: " + err.message);
+        }
+      };
+      reader.onerror = () => alert("ไม่สามารถอ่านไฟล์ได้");
+
+      reader.readAsDataURL(file);
+    });
+
+    // ---------------- Load Gallery Real-time ----------------
+    const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, snapshot => {
+      gallery.innerHTML = '';
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const div = document.createElement('div');
+        const img = document.createElement('img');
+        img.src = data.imageData;
+        div.appendChild(img);
+
+        const user = auth.currentUser;
+        if(user && user.uid === data.owner){
+          const delBtn = document.createElement('button');
+          delBtn.innerText = '×';
+          delBtn.className = 'delete-btn';
+          delBtn.onclick = async () => {
+            await deleteDoc(doc(db, 'users', docSnap.id));
+          };
+          div.appendChild(delBtn);
+        }
+
+        gallery.appendChild(div);
+      });
+    });
+
+  </script>
+</body>
+</html>

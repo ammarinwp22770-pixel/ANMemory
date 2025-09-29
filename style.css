@@ -46,7 +46,7 @@
 }
 
 /* ========================== */
-/* Reset และ font พื้นฐาน */
+/* Reset + Font พื้นฐาน */
 /* ========================== */
 * {
     margin: 0;
@@ -54,7 +54,6 @@
     box-sizing: border-box;
     font-family: 'Arial', sans-serif;
 }
-
 body, html {
     width: 100%;
     height: 100%;
@@ -62,18 +61,6 @@ body, html {
     background: var(--bg-color);
     color: var(--text-color);
     position: relative;
-}
-
-/* ========================== */
-/* Particle canvas */
-/* ========================== */
-#particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
 }
 
 /* ========================== */
@@ -85,30 +72,15 @@ body, html {
     padding: 40px 20px;
     text-align: center;
 }
-
-h1 {
-    color: var(--primary-color);
-    margin-bottom: 30px;
-}
+h1 { color: var(--primary-color); margin-bottom: 30px; }
 
 /* ========================== */
-/* Grid สำหรับ memory card */
+/* Grid Memory Card */
 /* ========================== */
 .memory-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-}
-
-/* ========================== */
-/* กรอบ memory card */
-/* ========================== */
-
-/* Popup */
-#love-popup > div {
-  max-width: 90%;
-  font-size: 1rem;
-  padding: 20px;
 }
 .memory-card {
     background: var(--card-bg);
@@ -118,260 +90,156 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.3s ease;
-    width: 45%; /* desktop */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
-@media (max-width: 768px) {
-  .memory-card {
-    width: 80%; /* tablet & mobile */
-  }
-  #love-popup > div {
-    font-size: 0.9rem;
-    padding: 15px;
-  }
-}
+.memory-card:hover { transform: scale(1.05); }
 
-/* เปิดของขวัญ */
-@keyframes openGift {
-  0%   { transform: scale(0.8) rotate(-15deg); opacity:0; }
-  50%  { transform: scale(1.1) rotate(10deg); opacity:1; }
-  80%  { transform: scale(0.95) rotate(-5deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
-.memory-card.opening {
-  animation: openGift 0.6s ease forwards;
-}
-
-.memory-card:hover {
-    transform: scale(1.05);
-}
-
-/* รูปในกรอบ */
+/* ========================== */
+/* ภาพ + Text ใน Card */
+/* ========================== */
 .memory-img {
     width: 100%;
     height: auto;
     border-radius: 15px;
     margin-bottom: 10px;
-    cursor: pointer;
+}
+.memory-text {
+    font-size: 14px;
+    color: var(--text-color);
+    text-align: center;
+    margin-top: 10px;
 }
 
-/* textarea สำหรับพิมพ์ memory */
-textarea {
-    width: 100%;
-    padding: 10px;
+/* ========================== */
+/* Timeline Card */
+/* ========================== */
+.timeline {
+    border-left: 3px solid var(--timeline-line);
+    padding-left: 20px;
+    margin-top: 20px;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+.timeline-item::before {
+    content:'';
+    position: absolute;
+    left: -12px; top:0;
+    width: 20px; height: 20px;
+    background-color: var(--timeline-line);
+    border-radius: 50%;
+    border: 2px solid var(--bg-color);
+}
+.timeline-date {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+.timeline-img {
+    width: 200px; height: 150px;
+    object-fit: cover;
     border-radius: 10px;
-    border: none;
-    resize: none;
-    font-family: 'Arial', sans-serif;
-    font-size: 14px;
-    height: 80px;
-    text-align: center;
+    cursor: pointer;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease;
+}
+.timeline-img:hover { transform: scale(1.05); }
+.timeline-content {
     background: var(--timeline-content-bg);
+    padding: 10px 15px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 500px;
     color: var(--text-color);
 }
 
 /* ========================== */
-/* Lightbox สำหรับขยายรูป */
+/* Lightbox Popup */
 /* ========================== */
-.lightbox {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  padding-top: 50px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--overlay-bg);
-  text-align: center;
+.lightbox, #lightbox-slide {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left:0; top:0;
+    width: 100%; height:100%;
+    background: var(--overlay-bg);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.lightbox-content, #slide-img {
+    display:flex; align-items:center; justify-content:center;
+}
+.lightbox-media img, .lightbox-media video, #slide-img {
+    max-width: 80%; max-height: 80%;
+    border-radius: 10px;
 }
 
-.lightbox-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+/* Lightbox Controls */
+#prev, #next, #prev-slide, #next-slide {
+    cursor: pointer;
+    font-size: 40px;
+    color: var(--text-color);
+    margin: 0 20px;
+    user-select: none;
 }
-
-.lightbox-media img,
-.lightbox-media video {
-  max-width: 80%;
-  max-height: 80%;
-  border-radius: 10px;
-}
-
-#prev, #next {
-  cursor: pointer;
-  font-size: 40px;
-  color: var(--text-color);
-  margin: 0 20px;
-  user-select: none;
-}
-
-#close-lightbox {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 40px;
-  color: var(--text-color);
-  cursor: pointer;
-}
-
-.memory-text {
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--text-color);
-  text-align: center;
+#close-lightbox, #close-slide {
+    position: absolute;
+    top: 20px; right: 30px;
+    font-size: 40px;
+    color: var(--text-color);
+    cursor: pointer;
 }
 
 /* ========================== */
-/* เพิ่มปุ่มเพลง */
+/* Music Button Floating */
 /* ========================== */
 .music-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--music-btn-bg);
-  border: none;
-  border-radius: 50%;
-  padding: 12px;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease, background 0.3s ease;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--music-btn-bg);
+    border: none;
+    border-radius: 50%;
+    padding: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, background 0.3s ease;
 }
-
 .music-btn:hover {
-  background: var(--music-btn-hover);
-  transform: scale(1.1);
+    transform: scale(1.1);
+    background: var(--music-btn-hover);
 }
-
 .music-btn img {
-  width: 28px;
-  height: 28px;
-  pointer-events: none;
+    width: 28px; height: 28px;
 }
 
 /* ========================== */
-/* ไทม์ไลน์สำหรับ memory-card */
+/* Animation Card / Popup */
 /* ========================== */
-.timeline {
-  border-left: 3px solid var(--timeline-line);
-  padding-left: 20px;
-  margin-top: 10px;
+@keyframes openGift {
+  0% { transform: scale(0.8) rotate(-15deg); opacity:0; }
+  50% { transform: scale(1.1) rotate(10deg); opacity:1; }
+  80% { transform: scale(0.95) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
+.memory-card.opening { animation: openGift 0.6s ease forwards; }
 
-.timeline-item {
-  position: relative;
-  margin-bottom: 25px;
-}
-
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  left: -12px;
-  top: 0;
-  width: 20px;
-  height: 20px;
-  background-color: var(--timeline-line);
-  border-radius: 50%;
-  border: 2px solid var(--bg-color);
-}
-
-.timeline-date {
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-bottom: 5px;
-}
-
-.timeline-img {
-  width: 200px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 5px;
-  transition: transform 0.3s;
-}
-
-.timeline-img:hover {
-  transform: scale(1.05);
-}
-
-.timeline-content {
-  background: var(--timeline-content-bg);
-  padding: 10px 15px;
-  border-radius: 10px;
-  display: inline-block;
-  max-width: 500px;
-  color: var(--text-color);
-}
-
-/* ========================== */
-/* Lightbox สำหรับ timeline */
-/* ========================== */
-#lightbox-slide {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--overlay-bg);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  flex-direction: column;
-}
-
-#slide-img {
-  max-width: 80%;
-  max-height: 70%;
-  border-radius: 15px;
-  object-fit: contain;
-}
-
-#close-slide {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 40px;
-  color: var(--text-color);
-  cursor: pointer;
-  z-index: 1000;
-}
-
-#prev-slide, #next-slide {
-  padding: 8px 15px;
-  margin: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  color: var(--text-color);
-}
-/* Card Animation */
-#anniversary-card {
-  transition: transform 0.5s ease, box-shadow 0.5s ease;
-  cursor: pointer;
-}
-#anniversary-card:hover {
-  transform: scale(1.05) rotate(-3deg);
-  box-shadow: 0 8px 20px rgba(255,20,147,0.3);
-}
-
-/* Popup Animation */
-#anniversary-popup .popup-inner {
-  animation: popupOpen 0.6s ease forwards;
-}
 @keyframes popupOpen {
   0% { transform: scale(0.5) rotate(-10deg); opacity:0; }
   60% { transform: scale(1.1) rotate(3deg); opacity:1; }
   100% { transform: scale(1) rotate(0deg); opacity:1; }
 }
+#anniversary-popup .popup-inner { animation: popupOpen 0.6s ease forwards; }
 
-/* Responsive */
-@media(max-width: 768px) {
-  #anniversary-popup .popup-inner {
-    width: 90%;
-    padding: 20px;
-  }
+/* ========================== */
+/* Responsive Adjustments */
+/* ========================== */
+@media(max-width:768px) {
+    .memory-card { width: 80%; }
+    .timeline-content { max-width: 90%; }
+    #anniversary-popup .popup-inner { width: 90%; padding: 20px; }
 }

@@ -369,6 +369,18 @@
   </style>
 </head>
 <body>
+
+<!-- Login/Register Modal -->
+<div id="auth-modal" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:30px; border-radius:20px; max-width:350px; width:90%; text-align:center; box-shadow:0 5px 20px rgba(0,0,0,0.3);">
+    <h2 id="auth-title">เข้าสู่ระบบ / สมัครสมาชิก</h2>
+    <input type="email" id="auth-email" placeholder="อีเมล" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ccc;">
+    <input type="password" id="auth-password" placeholder="รหัสผ่าน" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ccc;">
+    <button id="auth-login" style="padding:10px 20px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-weight:bold; cursor:pointer; margin:5px;">Login</button>
+    <button id="auth-register" style="padding:10px 20px; border:none; border-radius:12px; background:#ff1493; color:#fff; font-weight:bold; cursor:pointer; margin:5px;">Register</button>
+  </div>
+</div>
+
   <!-- Loading Screen -->
   <div id="loading-screen">
     <div class="heart">💖</div>
@@ -470,7 +482,92 @@
     <button id="close-anniversary" style="padding:8px 16px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-weight:bold; cursor:pointer;">ปิด 🎁</button>
   </div>
 </div>
+
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const authModal = document.getElementById("auth-modal");
+const mainContent = document.querySelector(".container");
+const loginBtn = document.getElementById("auth-login");
+const registerBtn = document.getElementById("auth-register");
+const emailInput = document.getElementById("auth-email");
+const passwordInput = document.getElementById("auth-password");
+
+
+// Logout Button
+const logoutBtn = document.createElement("button");
+logoutBtn.textContent = "Logout";
+logoutBtn.style = "padding:5px 10px; margin-left:10px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-weight:bold; cursor:pointer;";
+document.querySelector(".navbar").appendChild(logoutBtn);
+
+let justLoggedOut = false;
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    justLoggedOut = true;
+
+    const msg = document.createElement("div");
+    msg.className = "floating-text";
+    msg.innerText = "ออกจากระบบเรียบร้อย 💖";
+    msg.style.left = "50%";
+    msg.style.transform = "translateX(-50%)";
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 4000);
+  } catch (err) {
+    alert("เกิดข้อผิดพลาด: " + err.message);
+  }
+});
+
+// Register
+registerBtn.addEventListener("click", async () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    await setDoc(doc(db, "users", user.uid), { lovePoints: 0, loveHistory: [] });
+    alert("สมัครสมาชิกสำเร็จ 🎉");
+  } catch (err) {
+    alert("เกิดข้อผิดพลาด: " + err.message);
+  }
+});
+
+// Login
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("เข้าสู่ระบบสำเร็จ 🎉");
+  } catch (err) {
+    alert("เกิดข้อผิดพลาด: " + err.message);
+  }
+});
+
+// ตรวจสอบสถานะผู้ใช้
+
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    console.log("Logged in:", user.email);
+    authModal.style.display = "none";      // ซ่อน modal
+    container.style.display = "block";      // แสดง content
+    updatePointsDisplay();                  // อัปเดต Love Points
+    checkDailyLoveStatus();                 // เช็ค Daily Love
+  } else {
+    console.log("Not logged in");
+    authModal.style.display = "flex";       // แสดง modal
+    container.style.display = "none";       // ซ่อน content
+  }
+});
+</script>
+
 <script>
+
   // Anniversary Card
 const anniversaryCard = document.getElementById('anniversary-card');
 const anniversaryPopup = document.getElementById('anniversary-popup');
@@ -556,26 +653,37 @@ const loadingScreen = document.getElementById("loading-screen");
 const progressBar = document.getElementById("progress");
 const container = document.querySelector(".container");
 
-if (!sessionStorage.getItem("visited")) {
-  // ยังไม่เคยเข้ามาใน session นี้ → โชว์ loading
-  let progress = 0;
-  let loadingInterval = setInterval(() => {
-    progress += 5;
-    progressBar.style.width = progress + "%";
-    if (progress >= 100) {
-      clearInterval(loadingInterval);
-      setTimeout(() => {
-        loadingScreen.classList.add("hidden");
-        container.style.display = "block";
-        sessionStorage.setItem("visited", "true"); // บันทึกแค่ใน session
-      }, 500);
-    }
-  }, 150);
-} else {
-  // เคยเข้ามาแล้วใน session นี้ → ไม่ต้องโชว์ loading
-  loadingScreen.style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+ const loadingScreen = document.getElementById("loading-screen");
+const container = document.querySelector(".container");
+
+function showMainContent() {
   container.style.display = "block";
+  loadingScreen.classList.add("hidden");
 }
+
+// ตรวจสอบ session ว่าเคยเข้าหน้า index หรือยัง
+
+ const visitedIndex = localStorage.getItem("visitedIndex");
+  
+  if (!visitedIndex) {
+    let progress = 0;
+    const progressBar = document.getElementById("progress");
+    const interval = setInterval(() => {
+      progress += 5;
+      progressBar.style.width = progress + "%";
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          loadingScreen.classList.add("hidden");
+          localStorage.setItem("visitedIndex", "true");
+        }, 500);
+      }
+    }, 150);
+  } else {
+    loadingScreen.classList.add("hidden");
+  }
+});
 
 
 
@@ -711,37 +819,48 @@ function updatePointsDisplay() {
 
 // เรียกตอนโหลดหน้า
 updatePointsDisplay();
+checkDailyLoveStatus();
+
 
 // เมื่อกด Daily Love
 dailyLoveCard.addEventListener('click', () => {
   const today = new Date().toDateString();
 
+  // โหลดคะแนนสะสม
   let lovePoints = parseInt(localStorage.getItem("lovePoints")) || 0;
-  lovePoints += 10;
-  localStorage.setItem("lovePoints", lovePoints);
+  let loveHistory = JSON.parse(localStorage.getItem("loveHistory")) || [];
 
-  // อัปเดตโชว์คะแนนทันที
+  // เพิ่มคะแนน
+  lovePoints += 10;
+  loveHistory.push({ date: today, points: 10 });
+
+  // บันทึกลง localStorage
+  localStorage.setItem("lovePoints", lovePoints);
+  localStorage.setItem("loveHistory", JSON.stringify(loveHistory));
+
+  // อัปเดต UI
   updatePointsDisplay();
 
-  // แสดง popup ข้อความ + รางวัล
+  // แสดง popup
   let message = loveMessages[Math.floor(Math.random() * loveMessages.length)];
-  let rewardMessage = `${message}<br>คุณมี Love Points ทั้งหมด: ${lovePoints} ❤️`;
-
-  if(lovePoints >= 50 && !localStorage.getItem("reward50")) {
-    rewardMessage += `<br>🎉 คุณปลดล็อก ข้อความพิเศษแล้ว 💌`;
-    localStorage.setItem("reward50", "true");
-  }
-  if(lovePoints >= 100 && !localStorage.getItem("reward100")) {
-    rewardMessage += `<br>🌸 คุณปลดล็อก รูปความทรงจำแล้ว`;
-    localStorage.setItem("reward100", "true");
-  }
-  if(lovePoints >= 200 && !localStorage.getItem("reward200")) {
-    rewardMessage += `<br>🎬 คุณปลดล็อก คลิปวีดีโอสั้นแล้ว`;
-    localStorage.setItem("reward200", "true");
-  }
-
-  loveMessage.innerHTML = rewardMessage;
+  loveMessage.innerHTML = `${message}<br>คุณได้รับ +10 💖<br>รวมทั้งหมด: ${lovePoints} ❤️`;
   lovePopup.style.display = 'flex';
+
+  // สร้าง Floating Text +10 💖
+  const floating = document.createElement("div");
+  floating.className = "floating-text";
+  floating.innerText = "+10 💖";
+  floating.style.left = "50%";
+  floating.style.bottom = "100px";
+  floating.style.transform = "translateX(-50%)";
+  document.body.appendChild(floating);
+  setTimeout(() => floating.remove(), 2000);
+
+  // รีเซ็ต daily
+  const nextReset = new Date();
+  nextReset.setHours(6,0,0,0);
+  if(new Date() >= nextReset) nextReset.setDate(nextReset.getDate() + 1);
+  localStorage.setItem("loveNextReset", nextReset);
 
   checkDailyLoveStatus();
 });
